@@ -92,11 +92,12 @@ export function getCommandPath(command: Command): string {
   let current: Command | null = command;
 
   while (current) {
-    const name = current.name();
-    // Skip the root 'openspec' command
-    if (name && name !== 'openspec') {
-      names.unshift(name);
+    // Stop at the root program (it has no parent); never include its name
+    // in the telemetry/path, regardless of what the program is called.
+    if (current.parent === null) {
+      break;
     }
+    names.unshift(current.name());
     current = current.parent;
   }
 

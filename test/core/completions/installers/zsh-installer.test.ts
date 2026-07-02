@@ -8,8 +8,14 @@ import { ZshInstaller } from '../../../../src/core/completions/installers/zsh-in
 describe('ZshInstaller', () => {
   let testHomeDir: string;
   let installer: ZshInstaller;
+  let zshEnvBackup: string | undefined;
 
   beforeEach(async () => {
+    // Isolate from a developer environment that has OMZ set (e.g. $ZSH),
+    // which would otherwise make isOhMyZshInstalled() always return true.
+    zshEnvBackup = process.env.ZSH;
+    delete process.env.ZSH;
+
     // Create a temporary home directory for testing
     testHomeDir = path.join(os.tmpdir(), `openspec-zsh-test-${randomUUID()}`);
     await fs.mkdir(testHomeDir, { recursive: true });
@@ -19,6 +25,13 @@ describe('ZshInstaller', () => {
   afterEach(async () => {
     // Clean up test directory
     await fs.rm(testHomeDir, { recursive: true, force: true });
+
+    // Restore the OMZ environment variable
+    if (zshEnvBackup === undefined) {
+      delete process.env.ZSH;
+    } else {
+      process.env.ZSH = zshEnvBackup;
+    }
   });
 
   describe('isOhMyZshInstalled', () => {
