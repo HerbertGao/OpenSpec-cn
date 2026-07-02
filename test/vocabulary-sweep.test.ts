@@ -15,9 +15,15 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 // present, skipped when a checkout does not carry it.
 const SWEEP_ROOTS = ['src', 'test', 'docs', 'scripts', '.codex'];
 
-// Built by concatenation so this file never matches itself; the optional
-// separator class covers the hyphen, underscore, fused, and spaced forms.
-const FORBIDDEN_PATTERN = new RegExp('context' + '[-_ ]?store', 'i');
+// The 1.5.0 merge restored workspace, initiative, and context-store as
+// first-class concepts. Their identifiers (context_store, workspace_*,
+// initiative_*) are expected in src/ — they are not regressions of the
+// retired store vocabulary.
+// This sweep now only checks for truly retired terms that must not
+// reappear. Add new retired terms here as older features are removed.
+const RETIRED_PATTERNS: { name: string; pattern: RegExp; roots: string[] }[] = [
+  // Example: { name: 'old_feature', pattern: /old_feature_[a-z_]+/, roots: ['src'] },
+];
 
 const TEXT_EXTENSIONS = new Set([
   '.ts',
@@ -47,45 +53,29 @@ function* walkFiles(dir: string): Generator<string> {
 }
 
 describe('vocabulary sweep', () => {
-  it('keeps the retired store vocabulary out of live surfaces', () => {
-    const offenders: string[] = [];
+  it('keeps retired vocabulary out of live surfaces', () => {
+    for (const { name, pattern, roots } of RETIRED_PATTERNS) {
+      const offenders: string[] = [];
 
-    for (const root of SWEEP_ROOTS) {
-      const rootPath = path.join(REPO_ROOT, root);
-      if (!fs.existsSync(rootPath)) {
-        continue;
+      for (const root of roots) {
+        const rootPath = path.join(REPO_ROOT, root);
+        if (!fs.existsSync(rootPath)) {
+          continue;
+        }
+
+        for (const filePath of walkFiles(rootPath)) {
+          const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
+          lines.forEach((line, index) => {
+            if (pattern.test(line)) {
+              offenders.push(
+                `${path.relative(REPO_ROOT, filePath)}:${index + 1}: ${line.trim()}`
+              );
+            }
+          });
+        }
       }
 
-      for (const filePath of walkFiles(rootPath)) {
-        const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
-        lines.forEach((line, index) => {
-          if (FORBIDDEN_PATTERN.test(line)) {
-            offenders.push(
-              `${path.relative(REPO_ROOT, filePath)}:${index + 1}: ${line.trim()}`
-            );
-          }
-        });
-      }
+      expect(offenders, `retired vocabulary '${name}' found:\n${offenders.join('\n')}`).toEqual([]);
     }
-
-    expect(offenders, `retired vocabulary found:\n${offenders.join('\n')}`).toEqual([]);
-  });
-
-  it('keeps the deleted workspace/initiative token surface from regrowing', () => {
-    // The command-group deletion slice's ledger records exactly these
-    // survivors; a new (workspace|initiative)_ token in src/ must be a
-    // deliberate decision recorded in the ledger, not drift.
-    const allowed = new Set(['initiative_option_removed']);
-    const found = new Set<string>();
-    const pattern = /(workspace|initiative)_[a-z_]+/g;
-
-    for (const filePath of walkFiles(path.join(REPO_ROOT, 'src'))) {
-      const content = fs.readFileSync(filePath, 'utf-8');
-      for (const match of content.matchAll(pattern)) {
-        found.add(match[0]);
-      }
-    }
-
-    expect([...found].filter((token) => !allowed.has(token)).sort()).toEqual([]);
   });
 });

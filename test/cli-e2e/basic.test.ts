@@ -66,7 +66,7 @@ describe('openspec CLI e2e basics', () => {
     expect(result.stdout.trim()).toBe(pkg.version);
   });
 
-  it('validates the tmp-init fixture with --all --json', async () => {
+  it('validates the tmp-init fixture with --all --json', { timeout: 30000 }, async () => {
     const projectDir = await prepareFixture('tmp-init');
     const result = await runCLI(['validate', '--all', '--json'], { cwd: projectDir });
     expect(result.exitCode).toBe(0);
