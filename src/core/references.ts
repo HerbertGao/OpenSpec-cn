@@ -73,7 +73,7 @@ function registerFix(id: string, remote?: string): string {
     const quoted = process.platform === 'win32' ? `"${checkout}"` : `'${checkout}'`;
     return `git clone -- ${remote} ${quoted} && openspec-cn store register ${quoted} --id ${id}`;
   }
-  return `Get a checkout from a teammate and run: openspec-cn store register <path> --id ${id}`;
+  return `从队友处获取一个 checkout 并运行：openspec-cn store register <path> --id ${id}`;
 }
 
 /**
@@ -311,8 +311,8 @@ export async function assembleReferenceIndex(
         status: [
           warning(
             'reference_registry_unreadable',
-            `Referenced store '${id}' cannot be checked: the store registry is unreadable.`,
-            'Run: openspec-cn store doctor'
+            `被引用的 store '${id}' 无法检查：store 注册表不可读。`,
+            '运行：openspec-cn store doctor'
           ),
         ],
       });
@@ -326,7 +326,7 @@ export async function assembleReferenceIndex(
         status: [
           warning(
             'reference_unresolved',
-            `Referenced store '${id}' is not registered on this machine.`,
+            `被引用的 store '${id}' 未在本机注册。`,
             registerFix(id, remote)
           ),
         ],
@@ -348,7 +348,7 @@ export async function assembleReferenceIndex(
         status: [
           warning(
             'reference_root_unhealthy',
-            `Referenced store '${id}' is registered but not usable (${inspection.kind.replace(/_/g, ' ')}).`,
+            `被引用的 store '${id}' 已注册但不可用（${inspection.kind.replace(/_/g, ' ')}）。`,
             `Run: openspec-cn store doctor ${id}`
           ),
         ],
@@ -395,8 +395,8 @@ export async function assembleReferenceIndex(
       entry.status.push(
         warning(
           'reference_index_truncated',
-          `Referenced store '${id}' index truncated at the 50KB budget (${low} of ${specs.length} specs listed).`,
-          `List the rest directly: openspec-cn list --specs --store ${id}`
+          `被引用的 store '${id}' 索引在 50KB 预算处被截断（列出了 ${specs.length} 个 spec 中的 ${low} 个）。`,
+          `直接列出其余部分：openspec-cn list --specs --store ${id}`
         )
       );
     }

@@ -187,7 +187,7 @@ describe('InitCommand', () => {
       const logCalls = (console.log as unknown as { mock: { calls: unknown[][] } }).mock.calls.flat().map(String);
       expect(
         logCalls.some(
-          (entry) => entry.includes('Commands skipped for: kimi') && entry.includes('(no adapter)'),
+          (entry) => entry.includes('已跳过命令：kimi') && entry.includes('（无适配器）'),
         ),
       ).toBe(true);
     });
@@ -236,7 +236,7 @@ describe('InitCommand', () => {
     it('should throw error for invalid tool names', async () => {
       const initCommand = new InitCommand({ tools: 'invalid-tool', force: true });
 
-      await expect(initCommand.execute(testDir)).rejects.toThrow(/Invalid tool\(s\): invalid-tool/);
+      await expect(initCommand.execute(testDir)).rejects.toThrow(/无效工具：invalid-tool/);
     });
 
     it('should handle comma-separated tool names with spaces', async () => {
@@ -255,7 +255,7 @@ describe('InitCommand', () => {
       const initCommand = new InitCommand({ tools: 'all,claude', force: true });
 
       await expect(initCommand.execute(testDir)).rejects.toThrow(
-        /Cannot combine reserved values "all" or "none" with specific tool IDs/
+        /不能将保留值 "all" 或 "none" 与具体工具 ID 组合使用/
       );
     });
 
@@ -432,7 +432,7 @@ describe('InitCommand', () => {
     it('should throw error in non-interactive mode without --tools flag and no detected tools', async () => {
       const initCommand = new InitCommand({ interactive: false });
 
-      await expect(initCommand.execute(testDir)).rejects.toThrow(/No tools detected and no --tools flag/);
+      await expect(initCommand.execute(testDir)).rejects.toThrow(/未检测到工具且未提供 --tools 参数/);
     });
   });
 

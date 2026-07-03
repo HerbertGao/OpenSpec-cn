@@ -184,7 +184,7 @@ describe('reference index assembly', () => {
         globalDataDir,
       });
       expect(entries[0].status[0].fix).not.toContain('git clone');
-      expect(entries[0].status[0].fix).toContain('Get a checkout from a teammate');
+      expect(entries[0].status[0].fix).toContain('从队友处获取一个 checkout');
     }
   });
 
@@ -356,7 +356,7 @@ describe('reference index assembly', () => {
       Buffer.byteLength(`  Note: ${entry.status[0].message}\n  Fix: ${entry.status[0].fix}\n`);
     expect(Buffer.byteLength(rendered, 'utf-8')).toBeLessThanOrEqual(50 * 1024 + exempt);
     // The rendered block states the truncation, not just an orphan fix.
-    expect(rendered).toContain('Note: Referenced store \'huge-context\' index truncated');
+    expect(rendered).toContain('Note: 被引用的 store \'huge-context\' 索引在 50KB 预算处被截断');
   });
 
   it('renders the XML block and markdown section consistently', async () => {
@@ -374,8 +374,8 @@ describe('reference index assembly', () => {
     expect(block).toContain('  - bare');
     expect(block).not.toContain('  - bare:');
     expect(block).toContain('Fetch: openspec-cn show <spec-id> --type spec --store team-context');
-    expect(block).toContain("Store missing-context: Referenced store 'missing-context' is not registered on this machine.");
-    expect(block).toContain('Fix: Get a checkout from a teammate and run: openspec-cn store register <path> --id missing-context');
+    expect(block).toContain("Store missing-context: 被引用的 store 'missing-context' 未在本机注册。");
+    expect(block).toContain('Fix: 从队友处获取一个 checkout 并运行：openspec-cn store register <path> --id missing-context');
 
     expect(section).toContain('### Referenced Stores');
     expect(section).toContain('  - billing: Usage-based invoicing.');

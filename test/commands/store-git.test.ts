@@ -293,7 +293,7 @@ describe('store git lifecycle', () => {
     expect(registerStatus.code).toBe('store_register_root_unhealthy');
     expect(registerStatus.message).toContain('no commits');
     expect(registerStatus.fix).toBe(
-      'If this is a store clone: commit and push the origin store, pull it into this clone, then rerun register.'
+      '如果这是 store 克隆：提交并推送 origin store，拉取到此克隆中，然后重新运行 register。'
     );
   });
 });

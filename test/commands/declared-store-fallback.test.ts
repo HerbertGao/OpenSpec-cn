@@ -158,8 +158,8 @@ describe('declared store fallback (3.2)', () => {
 
     const refused = await runCLI(['init', '.'], { cwd: pointerRepo, env });
     expect(refused.exitCode).toBe(1);
-    expect(refused.stderr).toContain("externalized to store 'team-context'");
-    expect(refused.stderr).toContain('Remove the store: line');
+    expect(refused.stderr).toContain("此仓库的规划已外部化到 store 'team-context'");
+    expect(refused.stderr).toContain('移除 store: 行');
     expect(snapshot(pointerRepo)).toEqual(before);
     if (dataBefore) {
       expect(snapshot(path.join(tempDir, 'data'))).toEqual(dataBefore);
@@ -184,7 +184,7 @@ describe('declared store fallback (3.2)', () => {
     );
     const malformed = await runCLI(['init', '.'], { cwd: pointerRepo, env });
     expect(malformed.exitCode).toBe(1);
-    expect(malformed.stderr).toContain('Fix or remove the store: line');
+    expect(malformed.stderr).toContain('请先修复或移除 store: 行');
     expect(fs.existsSync(path.join(pointerRepo, 'openspec', 'specs'))).toBe(false);
 
     // And a subdirectory of a pointer repo must not grow a nested root
@@ -197,7 +197,7 @@ describe('declared store fallback (3.2)', () => {
     fs.mkdirSync(subdir, { recursive: true });
     const nested = await runCLI(['init', '.'], { cwd: subdir, env });
     expect(nested.exitCode).toBe(1);
-    expect(nested.stderr).toContain("externalized to store 'team-context'");
+    expect(nested.stderr).toContain("此仓库的规划已外部化到 store 'team-context'");
     expect(fs.existsSync(path.join(subdir, 'openspec'))).toBe(false);
   });
 

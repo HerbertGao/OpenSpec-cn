@@ -43,11 +43,11 @@ export function makeLockErrorFactory(
     if (kind === 'create-failed') {
       // A permission or filesystem problem, not contention - say so.
       return new StoreError(
-        `Cannot create ${data.createSubject} ${info.lockPath} (${(info.cause as NodeJS.ErrnoException)?.code ?? info.cause}).`,
+        `无法创建 ${data.createSubject} ${info.lockPath}（${(info.cause as NodeJS.ErrnoException)?.code ?? info.cause}）`,
         data.code,
         {
           target: data.target,
-          fix: `Check permissions on ${path.dirname(info.lockPath)}.`,
+          fix: `检查 ${path.dirname(info.lockPath)} 的权限。`,
         }
       );
     }

@@ -136,7 +136,7 @@ export class ChangeCommand {
           } catch (error) {
             return {
               id: changeName,
-              title: 'Unknown',
+              title: '未知',
               deltaCount: 0,
               taskStatus: { total: 0, completed: 0 },
             };
@@ -172,7 +172,7 @@ export class ChangeCommand {
             taskStatusText = ` [tasks ${completed}/${total}]`;
           } catch (error) {
             if (process.env.DEBUG) {
-              console.error(`Failed to read tasks file at ${tasksPath}:`, error);
+              console.error(`读取 tasks 文件失败：${tasksPath}:`, error);
             }
           }
           const changeDir = path.join(changesPath, changeName);

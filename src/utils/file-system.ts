@@ -141,7 +141,7 @@ export class FileSystemUtils {
       return true;
     } catch (error: any) {
       if (error.code !== 'ENOENT') {
-        console.debug(`Unable to check if file exists at ${filePath}: ${error.message}`);
+        console.debug(`无法检查文件是否存在于 ${filePath}：${error.message}`);
       }
       return false;
     }
@@ -175,7 +175,7 @@ export class FileSystemUtils {
           currentDir = parentDir;
         } else {
           // Unexpected error (permissions, I/O error, etc.)
-          console.debug(`Error checking directory ${currentDir}: ${error.message}`);
+          console.debug(`检查目录 ${currentDir} 时出错：${error.message}`);
           return null;
         }
       }
@@ -210,7 +210,7 @@ export class FileSystemUtils {
         return hasWritableModeAndAccess(existingDir);
       }
 
-      console.debug(`Unable to determine write permissions for ${filePath}: ${error.message}`);
+      console.debug(`无法确定 ${filePath} 的写入权限：${error.message}`);
       return false;
     }
   }
@@ -221,7 +221,7 @@ export class FileSystemUtils {
       return stats.isDirectory();
     } catch (error: any) {
       if (error.code !== 'ENOENT') {
-        console.debug(`Unable to check if directory exists at ${dirPath}: ${error.message}`);
+        console.debug(`无法检查目录是否存在于 ${dirPath}：${error.message}`);
       }
       return false;
     }
@@ -300,7 +300,7 @@ export class FileSystemUtils {
           if (attempt === maxRetries - 1) {
             // Last attempt failed, but we successfully wrote the file, so permissions are OK
             // Just log and continue - the temp file will be cleaned up eventually
-            console.debug(`Could not clean up test file ${testFile}: ${unlinkError.message}`);
+            console.debug(`无法清理测试文件 ${testFile}：${unlinkError.message}`);
           } else {
             // Wait briefly before retrying (Windows file lock release)
             await new Promise((resolve) => setTimeout(resolve, 50));
@@ -309,7 +309,7 @@ export class FileSystemUtils {
       }
       return true;
     } catch (error: any) {
-      console.debug(`Insufficient permissions to write to ${dirPath}: ${error.message}`);
+      console.debug(`写入 ${dirPath} 的权限不足：${error.message}`);
       return false;
     }
   }

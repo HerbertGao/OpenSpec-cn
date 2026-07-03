@@ -184,7 +184,7 @@ artifacts:
 `;
       fs.writeFileSync(path.join(userSchemaDir, 'schema.yaml'), cyclicSchema);
 
-      expect(() => resolveSchema('spec-driven')).toThrow(/Cyclic dependency/);
+      expect(() => resolveSchema('spec-driven')).toThrow(/循环依赖/);
     });
 
     it('should detect invalid requires references in user override schemas', () => {
@@ -205,7 +205,7 @@ artifacts:
 `;
       fs.writeFileSync(path.join(userSchemaDir, 'schema.yaml'), invalidRefSchema);
 
-      expect(() => resolveSchema('spec-driven')).toThrow(/does not exist/);
+      expect(() => resolveSchema('spec-driven')).toThrow(/不存在/);
     });
 
     it('should throw SchemaLoadError on YAML syntax errors', () => {
@@ -227,7 +227,7 @@ version: [[[invalid yaml
       } catch (e) {
         expect(e).toBeInstanceOf(SchemaLoadError);
         const error = e as SchemaLoadError;
-        expect(error.message).toContain('Failed to parse');
+        expect(error.message).toContain('解析');
         expect(error.message).toContain(schemaPath);
       }
     });

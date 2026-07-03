@@ -150,7 +150,7 @@ describe('createChange', () => {
   describe('schema validation', () => {
     it('should throw error for unknown schema', async () => {
       await expect(createChange(testDir, 'add-auth', { schema: 'unknown-schema' })).rejects.toThrow(
-        /Unknown schema/
+        /未知 schema/
       );
     });
   });
@@ -160,7 +160,7 @@ describe('createChange', () => {
       await createChange(testDir, 'add-auth');
 
       await expect(createChange(testDir, 'add-auth')).rejects.toThrow(
-        /already exists/
+        /已存在
       );
     });
   });

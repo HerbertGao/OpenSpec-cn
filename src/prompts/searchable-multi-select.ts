@@ -74,7 +74,7 @@ async function createSearchableMultiSelect(): Promise<
         if (validate) {
           const result = validate(selectedValues);
           if (result !== true) {
-            setError(typeof result === 'string' ? result : 'Invalid');
+            setError(typeof result === 'string' ? result : '无效');
             return;
           }
         }

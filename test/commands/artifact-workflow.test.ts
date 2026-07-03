@@ -275,8 +275,8 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['instructions', '--change', 'test-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Missing required argument <artifact>');
-      expect(output).toContain('Valid artifacts');
+      expect(output).toContain('缺少必要参数 <artifact>');
+      expect(output).toContain('可用产出物');
     });
 
     it('errors for unknown artifact', async () => {
@@ -287,8 +287,8 @@ describe('artifact-workflow CLI commands', () => {
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("Artifact 'unknown-artifact' not found");
-      expect(output).toContain('Valid artifacts');
+      expect(output).toContain("未找到产出物 'unknown-artifact'");
+      expect(output).toContain('可用产出物');
     });
   });
 
@@ -410,7 +410,7 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['new', 'change', 'existing-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('exists');
+      expect(output).toContain('已存在');
     });
 
     it('errors when name argument is missing', async () => {
@@ -552,7 +552,7 @@ apply:
       });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('complete ✓');
-      expect(result.stdout).toContain('ready to be archived');
+      expect(result.stdout).toContain('可以归档了');
     });
 
     it('uses spec-driven schema apply configuration', async () => {
@@ -716,7 +716,7 @@ artifacts:
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Invalid tool(s): unknown-tool');
+      expect(output).toContain('无效工具：unknown-tool');
     });
 
     it('errors for tool without skillsDir', async () => {
@@ -726,7 +726,7 @@ artifacts:
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Invalid tool(s): agents');
+      expect(output).toContain('无效工具：agents');
     });
 
     it('creates skills for Claude tool', async () => {

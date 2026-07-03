@@ -195,8 +195,8 @@ export async function buildUpdatedSpec(
   const hasAnyDelta = plan.added.length + plan.modified.length + plan.removed.length + plan.renamed.length > 0;
   if (!hasAnyDelta) {
     throw new Error(
-      `Delta parsing found no operations for ${path.basename(path.dirname(update.source))}. ` +
-        `Provide ADDED/MODIFIED/REMOVED/RENAMED sections in change spec.`
+      `Delta 解析未找到 ${path.basename(path.dirname(update.source))} 的操作。` +
+        `请在 change spec 中提供 ADDED/MODIFIED/REMOVED/RENAMED 章节。`
     );
   }
 

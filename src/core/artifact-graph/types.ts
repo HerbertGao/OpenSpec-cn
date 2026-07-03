@@ -13,7 +13,7 @@ export const ArtifactSchema = z.object({
 // Apply phase configuration for schema-aware apply instructions
 export const ApplyPhaseSchema = z.object({
   // Artifact IDs that must exist before apply is available
-  requires: z.array(z.string()).min(1, { error: 'At least one required artifact' }),
+  requires: z.array(z.string()).min(1, { error: '至少需要一个必需的产出物' }),
   // Path to file with checkboxes for progress (relative to change dir), or null if no tracking
   tracks: z.string().nullable().optional(),
   // Custom guidance for the apply phase
@@ -22,10 +22,10 @@ export const ApplyPhaseSchema = z.object({
 
 // Full schema YAML structure
 export const SchemaYamlSchema = z.object({
-  name: z.string().min(1, { error: 'Schema name is required' }),
-  version: z.number().int().positive({ error: 'Version must be a positive integer' }),
+  name: z.string().min(1, { error: 'Schema 名称是必需的' }),
+  version: z.number().int().positive({ error: '版本必须是正整数' }),
   description: z.string().optional(),
-  artifacts: z.array(ArtifactSchema).min(1, { error: 'At least one artifact required' }),
+  artifacts: z.array(ArtifactSchema).min(1, { error: '至少需要一个产出物' }),
   // Optional apply phase configuration (for schema-aware apply instructions)
   apply: ApplyPhaseSchema.optional(),
 });

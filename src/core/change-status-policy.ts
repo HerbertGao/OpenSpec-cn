@@ -72,7 +72,7 @@ export function buildNextSteps(input: ChangeNextStepsInput): string[] {
       `Run openspec-cn instructions ${readyArtifact.id} --change "${input.changeName}"${storeFlag} --json before writing that artifact.`
     );
   } else if (input.allArtifactsComplete) {
-    steps.push('All planning artifacts are complete; review tasks before implementation.');
+    steps.push('所有规划产出物已完成；在实现前审查任务。');
   }
 
   return steps;

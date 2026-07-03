@@ -42,7 +42,7 @@ export async function initGitRepository(storeRoot: string): Promise<boolean> {
     await execFileAsync('git', ['init'], { cwd: storeRoot });
   } catch (error) {
     throw new StoreError(
-      `Failed to initialize Git repository: ${error instanceof Error ? error.message : String(error)}`,
+      `初始化 Git 仓库失败：${error instanceof Error ? error.message : String(error)}`,
       'store_git_init_failed',
       {
         target: 'store.git',
@@ -65,7 +65,7 @@ export async function assertGitCommitIdentity(probeCwd: string): Promise<void> {
     } catch (error) {
       if (isSpawnNotFoundError(error)) {
         throw new StoreError(
-          'Git is not available, so setup cannot create the initial store commit.',
+          'Git 不可用，因此 setup 无法创建初始 store 提交。',
           'store_git_init_failed',
           {
             target: 'store.git',
@@ -75,7 +75,7 @@ export async function assertGitCommitIdentity(probeCwd: string): Promise<void> {
       }
 
       throw new StoreError(
-        'No usable Git commit identity is configured, so setup cannot create the initial store commit.',
+        '没有可用的 Git 提交身份配置，因此 setup 无法创建初始 store 提交。',
         'store_git_identity_missing',
         {
           target: 'store.git',
@@ -115,7 +115,7 @@ export async function commitStoreFiles(
     }).catch(() => undefined);
 
     throw new StoreError(
-      `Failed to create the initial store commit: ${error instanceof Error ? error.message : String(error)}`,
+      `创建初始 store 提交失败：${error instanceof Error ? error.message : String(error)}`,
       'store_git_commit_failed',
       {
         target: 'store.git',

@@ -148,7 +148,7 @@ describe('BashInstaller', () => {
       const result = await invalidInstaller.install(testScript);
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('Failed to install');
+      expect(result.message).toContain('安装补全脚本失败');
     });
 
     it.skipIf(process.platform === 'win32')('should return failure when completion directory is not writable', async () => {
@@ -165,8 +165,8 @@ describe('BashInstaller', () => {
       }
 
       expect(result?.success).toBe(false);
-      expect(result?.message).toContain('Failed to install');
-      expect(result?.message).toContain(`Path is not writable: ${targetPath}`);
+      expect(result?.message).toContain('安装补全脚本失败');
+      expect(result?.message).toContain(`路径不可写：${targetPath}`);
     });
 
     it('should detect already-installed completion with identical content', async () => {
@@ -178,8 +178,8 @@ describe('BashInstaller', () => {
       const secondResult = await installer.install(testScript);
 
       expect(secondResult.success).toBe(true);
-      expect(secondResult.message).toContain('already installed');
-      expect(secondResult.message).toContain('up to date');
+      expect(secondResult.message).toContain('已安装');
+      expect(secondResult.message).toContain('已是最新');
       expect(secondResult.backupPath).toBeUndefined();
     });
 
@@ -194,7 +194,7 @@ describe('BashInstaller', () => {
       const secondResult = await installer.install(secondScript);
 
       expect(secondResult.success).toBe(true);
-      expect(secondResult.message).toContain('updated successfully');
+      expect(secondResult.message).toContain('更新成功');
       expect(secondResult.backupPath).toBeDefined();
 
       // Verify new content was written
@@ -244,7 +244,7 @@ describe('BashInstaller', () => {
       const result = await installer.uninstall();
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('uninstalled successfully');
+      expect(result.message).toContain('卸载成功');
 
       // Verify file is gone
       const targetPath = await installer.getInstallationPath();
@@ -252,11 +252,11 @@ describe('BashInstaller', () => {
       expect(exists).toBe(false);
     });
 
-    it('should return failure when not installed', async () => {
+    it('should return failure when 未安装', async () => {
       const result = await installer.uninstall();
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('not installed');
+      expect(result.message).toContain('未安装');
     });
 
     it('should remove .bashrc configuration', async () => {

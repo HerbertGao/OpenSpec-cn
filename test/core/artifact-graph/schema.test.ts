@@ -67,7 +67,7 @@ artifacts:
     template: templates/proposal.md
 `;
       expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
-      expect(() => parseSchema(yaml)).toThrow(/positive/);
+      expect(() => parseSchema(yaml)).toThrow(/正整数/);
     });
 
     it('should throw on empty artifacts array', () => {
@@ -111,7 +111,7 @@ artifacts:
       - nonexistent
 `;
       expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
-      expect(() => parseSchema(yaml)).toThrow(/Invalid dependency reference.*nonexistent/);
+      expect(() => parseSchema(yaml)).toThrow(/依赖引用无效.*nonexistent/);
     });
 
     it('should detect self-referencing cycle', () => {
@@ -127,7 +127,7 @@ artifacts:
       - A
 `;
       expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
-      expect(() => parseSchema(yaml)).toThrow(/Cyclic dependency detected/);
+      expect(() => parseSchema(yaml)).toThrow(/检测到循环依赖/);
     });
 
     it('should detect simple A → B → A cycle', () => {
@@ -149,7 +149,7 @@ artifacts:
       - A
 `;
       expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
-      expect(() => parseSchema(yaml)).toThrow(/Cyclic dependency detected/);
+      expect(() => parseSchema(yaml)).toThrow(/检测到循环依赖/);
       expect(() => parseSchema(yaml)).toThrow(/→/);
     });
 
@@ -178,7 +178,7 @@ artifacts:
       - B
 `;
       expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
-      expect(() => parseSchema(yaml)).toThrow(/Cyclic dependency detected/);
+      expect(() => parseSchema(yaml)).toThrow(/检测到循环依赖/);
       // Should contain all three in the cycle path
       const error = (() => {
         try {

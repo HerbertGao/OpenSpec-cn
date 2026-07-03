@@ -384,7 +384,7 @@ export async function cleanupLegacyArtifacts(
       await FileSystemUtils.writeFile(filePath, newContent);
       result.modifiedFiles.push(fileName);
     } catch (error: any) {
-      result.errors.push(`Failed to modify ${fileName}: ${error.message}`);
+      result.errors.push(`修改 ${fileName} 失败：${error.message}`);
     }
   }
 
@@ -395,7 +395,7 @@ export async function cleanupLegacyArtifacts(
       await fs.rm(fullPath, { recursive: true, force: true });
       result.deletedDirs.push(dirPath);
     } catch (error: any) {
-      result.errors.push(`Failed to delete directory ${dirPath}: ${error.message}`);
+      result.errors.push(`删除目录 ${dirPath} 失败：${error.message}`);
     }
   }
 
@@ -406,7 +406,7 @@ export async function cleanupLegacyArtifacts(
       await fs.unlink(fullPath);
       result.deletedFiles.push(filePath);
     } catch (error: any) {
-      result.errors.push(`Failed to delete ${filePath}: ${error.message}`);
+      result.errors.push(`删除 ${filePath} 失败：${error.message}`);
     }
   }
 
@@ -418,7 +418,7 @@ export async function cleanupLegacyArtifacts(
         await fs.unlink(agentsPath);
         result.deletedFiles.push('openspec/AGENTS.md');
       } catch (error: any) {
-        result.errors.push(`Failed to delete openspec/AGENTS.md: ${error.message}`);
+        result.errors.push(`删除 openspec/AGENTS.md 失败：${error.message}`);
       }
     }
   }
@@ -440,7 +440,7 @@ export function formatCleanupSummary(result: CleanupResult): string {
   const lines: string[] = [];
 
   if (result.deletedFiles.length > 0 || result.deletedDirs.length > 0 || result.modifiedFiles.length > 0) {
-    lines.push('Cleaned up legacy files:');
+    lines.push('已清理旧版文件：');
 
     for (const file of result.deletedFiles) {
       lines.push(`  ✓ Removed ${file}`);
@@ -466,7 +466,7 @@ export function formatCleanupSummary(result: CleanupResult): string {
     if (lines.length > 0) {
       lines.push('');
     }
-    lines.push('Errors during cleanup:');
+    lines.push('清理过程中的错误：');
     for (const error of result.errors) {
       lines.push(`  ⚠ ${error}`);
     }
@@ -546,17 +546,16 @@ export function formatDetectionSummary(detection: LegacyDetectionResult): string
   }
 
   // Header - welcoming upgrade message
-  lines.push(chalk.bold('Upgrading to the new OpenSpec'));
+  lines.push(chalk.bold('升级到新版 OpenSpec'));
   lines.push('');
-  lines.push('OpenSpec now uses agent skills, the emerging standard across coding');
-  lines.push('agents. This simplifies your setup while keeping everything working');
-  lines.push('as before.');
+  lines.push('OpenSpec 现在使用 agent skills——这是各编程 agent 工具中');
+  lines.push('正在兴起的标准。这简化了您的设置，同时保持一切照常工作。');
   lines.push('');
 
   // Section 1: Files to remove (no user content to preserve)
   if (removals.length > 0) {
-    lines.push(chalk.bold('Files to remove'));
-    lines.push(chalk.dim('No user content to preserve:'));
+    lines.push(chalk.bold('待移除文件'));
+    lines.push(chalk.dim('无需保留的用户内容：'));
     for (const { path } of removals) {
       lines.push(`  • ${path}`);
     }
@@ -565,8 +564,8 @@ export function formatDetectionSummary(detection: LegacyDetectionResult): string
   // Section 2: Files to update (markers removed, content preserved)
   if (updates.length > 0) {
     if (removals.length > 0) lines.push('');
-    lines.push(chalk.bold('Files to update'));
-    lines.push(chalk.dim('OpenSpec markers will be removed, your content preserved:'));
+    lines.push(chalk.bold('待更新文件'));
+    lines.push(chalk.dim('OpenSpec 标记将被移除，您的内容会保留：'));
     for (const { path } of updates) {
       lines.push(`  • ${path}`);
     }
@@ -638,7 +637,7 @@ export function getToolsFromLegacyArtifacts(detection: LegacyDetectionResult): s
  */
 export function formatProjectMdMigrationHint(): string {
   const lines: string[] = [];
-  lines.push(chalk.yellow.bold('Needs your attention'));
+  lines.push(chalk.yellow.bold('需要您注意'));
   lines.push('  • openspec/project.md');
   lines.push(chalk.dim('    We won\'t delete this file. It may contain useful project context.'));
   lines.push('');

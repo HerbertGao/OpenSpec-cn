@@ -66,13 +66,13 @@ function formatRelativeTime(date: Date): string {
   if (diffDays > 30) {
     return date.toLocaleDateString();
   } else if (diffDays > 0) {
-    return `${diffDays}d ago`;
+    return `${diffDays} 天前`;
   } else if (diffHours > 0) {
-    return `${diffHours}h ago`;
+    return `${diffHours} 小时前`;
   } else if (diffMins > 0) {
-    return `${diffMins}m ago`;
+    return `${diffMins} 分钟前`;
   } else {
-    return 'just now';
+    return '刚刚';
   }
 }
 
@@ -87,7 +87,7 @@ export class ListCommand {
       try {
         await fs.access(changesDir);
       } catch {
-        throw new Error("No OpenSpec changes directory found. Run 'openspec init' first.");
+        throw new Error("未找到 OpenSpec changes 目录。请先运行 'openspec init'。");
       }
 
       // Get all directories in changes (excluding archive)
@@ -141,7 +141,7 @@ export class ListCommand {
       }
 
       // Display results
-      console.log('Changes:');
+      console.log('变更：');
       const padding = '  ';
       const nameWidth = Math.max(...changes.map(c => c.name.length));
       for (const change of changes) {
@@ -161,7 +161,7 @@ export class ListCommand {
       if (json) {
         console.log(JSON.stringify({ specs: [], ...(root ? { root } : {}) }, null, 2));
       } else {
-        console.log('No specs found.');
+        console.log('未找到规范。');
       }
       return;
     }
@@ -172,7 +172,7 @@ export class ListCommand {
       if (json) {
         console.log(JSON.stringify({ specs: [], ...(root ? { root } : {}) }, null, 2));
       } else {
-        console.log('No specs found.');
+        console.log('未找到规范。');
       }
       return;
     }
@@ -199,12 +199,12 @@ export class ListCommand {
       return;
     }
 
-    console.log('Specs:');
+    console.log('规范：');
     const padding = '  ';
     const nameWidth = Math.max(...specs.map(s => s.id.length));
     for (const spec of specs) {
       const padded = spec.id.padEnd(nameWidth);
-      console.log(`${padding}${padded}     requirements ${spec.requirementCount}`);
+      console.log(`${padding}${padded}     需求数 ${spec.requirementCount}`);
     }
   }
 }

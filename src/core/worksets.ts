@@ -234,8 +234,8 @@ export async function readWorksetsState(
 }
 
 const worksetsLockError = makeLockErrorFactory({
-  createSubject: 'the worksets lock file',
-  busyMessage: 'The worksets file is busy.',
+  createSubject: 'worksets 锁文件',
+  busyMessage: 'Worksets 文件正忙。',
   code: 'workset_file_busy',
   target: 'workset.file',
 });

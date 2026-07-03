@@ -154,7 +154,7 @@ export async function createChange(
 
   // Check if change already exists
   if (await FileSystemUtils.directoryExists(changeDir)) {
-    throw new Error(`Change '${name}' already exists at ${changeDir}`);
+    throw new Error(`Change '${name}' 已存在：${changeDir}`);
   }
 
   // Creating a change may scaffold or complete the root itself (an

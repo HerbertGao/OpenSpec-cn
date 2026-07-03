@@ -665,7 +665,7 @@ describe('openspec workset (7.1)', () => {
       expect(withTool.exitCode).toBe(1);
       const payload = parseJson(withTool);
       expect(payload.status[0].code).toBe('invalid_opener_config');
-      expect(payload.status[0].fix).toContain("'workspace-file' or 'attach-dirs'");
+      expect(payload.status[0].fix).toContain("'workspace-file' 或 'attach-dirs'");
     });
   });
 

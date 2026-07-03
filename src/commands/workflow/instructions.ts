@@ -107,7 +107,7 @@ export async function instructionsCommand(
     return;
   }
 
-  const spinner = options.json ? undefined : ora('Generating instructions...').start();
+  const spinner = options.json ? undefined : ora('正在生成指令...').start();
 
   try {
     const planningHome = toPlanningHome(root);
@@ -134,7 +134,7 @@ export async function instructionsCommand(
       spinner?.stop();
       const validIds = context.graph.getAllArtifacts().map((a) => a.id);
       throw new Error(
-        `Missing required argument <artifact>. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `缺少必要参数 <artifact>。可用产出物：\n  ${validIds.join('\n  ')}`
       );
     }
 
@@ -144,7 +144,7 @@ export async function instructionsCommand(
       spinner?.stop();
       const validIds = context.graph.getAllArtifacts().map((a) => a.id);
       throw new Error(
-        `Artifact '${artifactId}' not found in schema '${context.schemaName}'. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `在 schema '${context.schemaName}' 中未找到产出物 '${artifactId}'。可用产出物：\n  ${validIds.join('\n  ')}`
       );
     }
 
@@ -235,7 +235,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   // Dependencies (files to read for context)
   if (dependencies.length > 0) {
     console.log('<dependencies>');
-    console.log('Read these files for context before creating this artifact:');
+    console.log('创建此产出物前请阅读以下文件以获取上下文：');
     console.log();
     for (const dep of dependencies) {
       const status = dep.done ? 'done' : 'missing';
@@ -395,7 +395,7 @@ export async function generateApplyInstructions(
 
   if (missingArtifacts.length > 0) {
     state = 'blocked';
-    instruction = `Cannot apply this change yet. Missing artifacts: ${missingArtifacts.join(', ')}.\nUse the openspec-continue-change skill to create the missing artifacts first.`;
+    instruction = `暂时无法应用此变更。缺少产出物：${missingArtifacts.join(', ')}。\n请先使用 openspec-continue-change skill 创建缺失的产出物。`;
   } else if (tracksFile && !tracksFileExists) {
     // Tracking file configured but doesn't exist yet
     const tracksFilename = path.basename(tracksFile);
@@ -408,14 +408,14 @@ export async function generateApplyInstructions(
     instruction = `The ${tracksFilename} file exists but contains no tasks.\nAdd tasks to ${tracksFilename} or regenerate it with openspec-continue-change.`;
   } else if (tracksFile && remaining === 0 && total > 0) {
     state = 'all_done';
-    instruction = 'All tasks are complete! This change is ready to be archived.\nConsider running tests and reviewing the changes before archiving.';
+    instruction = '所有任务已完成！此变更可以归档了。\n归档前请考虑运行测试并审查变更。';
   } else if (!tracksFile) {
     // No tracking file configured in schema - ready to apply
     state = 'ready';
     instruction = schemaInstruction?.trim() ?? '所有必需的产出物已完成。可以开始实现。';
   } else {
     state = 'ready';
-    instruction = schemaInstruction?.trim() ?? 'Read context files, work through pending tasks, mark complete as you go.\nPause if you hit blockers or need clarification.';
+    instruction = schemaInstruction?.trim() ?? '阅读上下文文件，按顺序处理待办任务，完成一项就标记一项。\n遇到阻塞或需要澄清时暂停。';
   }
 
   return {
@@ -439,7 +439,7 @@ export async function applyInstructionsCommand(options: ApplyInstructionsOptions
     return;
   }
 
-  const spinner = options.json ? undefined : ora('Generating apply instructions...').start();
+  const spinner = options.json ? undefined : ora('正在生成应用指令...').start();
 
   try {
     const planningHome = toPlanningHome(root);

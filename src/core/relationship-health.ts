@@ -83,8 +83,8 @@ export function inspectRelationships(input: InspectRelationshipsInput): Relation
     status.push(
       warning(
         'root_pointer_invalid',
-        `${input.malformedPointer.filePath} declares a store: pointer that cannot be used (${storePointerProblem(input.malformedPointer.reason)}).`,
-        `Fix or remove the store: line in ${input.malformedPointer.filePath}.`
+        `${input.malformedPointer.filePath} 声明了一个无法使用的 store: 指针（${storePointerProblem(input.malformedPointer.reason)}）。`,
+        `请修复或移除 ${input.malformedPointer.filePath} 中的 store: 行。`
       )
     );
   }

@@ -196,7 +196,7 @@ export class ArchiveCommand {
     try {
       await fs.access(changesDir);
     } catch {
-      throw new Error("No OpenSpec changes directory found. Run 'openspec init' first.");
+      throw new Error("未找到 OpenSpec changes 目录。请先运行 'openspec init'。");
     }
 
     // Get change name interactively if not provided
@@ -427,7 +427,7 @@ export class ArchiveCommand {
               );
             }
             console.log(String(err.message || err));
-            console.log('Aborted. No files were changed.');
+            console.log('已中止。未更改任何文件。');
             return null;
           }
 
@@ -441,16 +441,16 @@ export class ArchiveCommand {
                 if (json) {
                   throw new ArchiveBlockedError(
                     'archive_spec_validation_failed',
-                    `Rebuilt spec for '${specName}' failed validation. No files were changed.`,
-                    `Run ${withStoreFlag(root, `openspec validate ${specName}`)} after fixing the change deltas.`
+                    `为 '${specName}' 重建的 spec 验证失败。未更改任何文件。`,
+                    `修复 change deltas 后运行 ${withStoreFlag(root, `openspec validate ${specName}`)}。`
                   );
                 }
-                console.log(chalk.red(`\nValidation errors in rebuilt spec for ${specName} (will not write changes):`));
+                console.log(chalk.red(`\n${specName} 重建规范中存在验证错误（不会写入更改）：`));
                 for (const issue of report.issues) {
                   if (issue.level === 'ERROR') console.log(chalk.red(`  ✗ ${issue.message}`));
                   else if (issue.level === 'WARNING') console.log(chalk.yellow(`  ⚠ ${issue.message}`));
                 }
-                console.log('Aborted. No files were changed.');
+                console.log('已中止。未更改任何文件。');
                 return null;
               }
             }
@@ -473,10 +473,9 @@ export class ArchiveCommand {
           totals = writeTotals;
           if (!json) {
             console.log(
-              `Totals: + ${writeTotals.added}, ~ ${writeTotals.modified}, - ${writeTotals.removed}, → ${writeTotals.renamed}`
+              `总计：+ ${writeTotals.added}, ~ ${writeTotals.modified}, - ${writeTotals.removed}, → ${writeTotals.renamed}`
             );
-            console.log('specs 更新成功。');
-          }
+            console.log('specs 更新成功。');          }
         }
       }
     }

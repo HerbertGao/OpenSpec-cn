@@ -143,7 +143,7 @@ export class BashInstaller {
       return true;
     } catch (error: any) {
       // Fail gracefully - don't break installation
-      console.debug(`Unable to configure .bashrc for completions: ${error.message}`);
+      console.debug(`无法为补全配置 .bashrc：${error.message}`);
       return false;
     }
   }
@@ -199,7 +199,7 @@ export class BashInstaller {
       return true;
     } catch (error: any) {
       // Fail gracefully
-      console.debug(`Unable to remove .bashrc configuration: ${error.message}`);
+      console.debug(`无法移除 .bashrc 配置：${error.message}`);
       return false;
     }
   }
@@ -226,10 +226,10 @@ export class BashInstaller {
           return {
             success: true,
             installedPath: targetPath,
-            message: 'Completion script is already installed (up to date)',
+            message: '补全脚本已安装（已是最新）',
             instructions: [
-              'The completion script is already installed and up to date.',
-              'If completions are not working, try: exec bash',
+              '补全脚本已安装且是最新版本。',
+              '如果补全不工作，尝试：exec bash',
             ],
           };
         }
@@ -237,11 +237,11 @@ export class BashInstaller {
         isUpdate = true;
       } catch (error: any) {
         // File doesn't exist or can't be read, proceed with installation
-        console.debug(`Unable to read existing completion file at ${targetPath}: ${error.message}`);
+        console.debug(`无法读取已存在的补全文件：${targetPath}: ${error.message}`);
       }
 
       if (!(await FileSystemUtils.canWriteFile(targetPath))) {
-        throw new Error(`Path is not writable: ${targetPath}`);
+        throw new Error(`路径不可写：${targetPath}`);
       }
 
       // Ensure the directory exists
@@ -266,11 +266,11 @@ export class BashInstaller {
         warnings.push(
           '⚠️  Warning: bash-completion package not detected',
           '',
-          'The completion script requires bash-completion to function.',
-          'Install it with:',
+          '此补全脚本需要 bash-completion 才能工作。',
+          '安装方式：',
           '  brew install bash-completion@2',
           '',
-          'Then add to your ~/.bash_profile:',
+          '然后添加到你的 ~/.bash_profile：',
           '  [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"'
         );
       }
@@ -279,12 +279,12 @@ export class BashInstaller {
       let message: string;
       if (isUpdate) {
         message = backupPath
-          ? 'Completion script updated successfully (previous version backed up)'
-          : 'Completion script updated successfully';
+          ? '补全脚本更新成功（已备份旧版本）'
+          : '补全脚本更新成功';
       } else {
         message = bashrcConfigured
-          ? 'Completion script installed and .bashrc configured successfully'
-          : 'Completion script installed successfully for Bash';
+          ? '补全脚本安装成功且 .bashrc 已配置'
+          : 'Bash 补全脚本安装成功';
       }
 
       return {
@@ -299,7 +299,7 @@ export class BashInstaller {
     } catch (error) {
       return {
         success: false,
-        message: `Failed to install completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `安装补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -314,9 +314,9 @@ export class BashInstaller {
     const completionsDir = path.dirname(installedPath);
 
     return [
-      'Completion script installed successfully.',
+      '补全脚本安装成功。',
       '',
-      'To enable completions, add the following to your ~/.bashrc file:',
+      '要启用补全，请将以下内容添加到你的 ~/.bashrc 文件：',
       '',
       `  # Source OpenSpec completions`,
       `  if [ -d "${completionsDir}" ]; then`,
@@ -325,7 +325,7 @@ export class BashInstaller {
       '    done',
       '  fi',
       '',
-      'Then restart your shell or run: exec bash',
+      '然后重启 shell 或运行：exec bash',
     ];
   }
 
@@ -346,7 +346,7 @@ export class BashInstaller {
       } catch {
         return {
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         };
       }
 
@@ -358,12 +358,12 @@ export class BashInstaller {
 
       return {
         success: true,
-        message: 'Completion script uninstalled successfully',
+        message: '补全脚本卸载成功',
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to uninstall completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `卸载补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

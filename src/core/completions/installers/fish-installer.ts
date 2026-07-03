@@ -6,7 +6,7 @@ import { InstallationResult } from '../factory.js';
 
 /**
  * Installer for Fish completion scripts.
- * Fish automatically loads completions from ~/.config/fish/completions/
+ * Fish 会自动从 ~/.config/fish/completions/ 加载补全
  */
 export class FishInstaller {
   private readonly homeDir: string;
@@ -63,10 +63,10 @@ export class FishInstaller {
           return {
             success: true,
             installedPath: targetPath,
-            message: 'Completion script is already installed (up to date)',
+            message: '补全脚本已安装（已是最新）',
             instructions: [
-              'The completion script is already installed and up to date.',
-              'Fish automatically loads completions - they should be available immediately.',
+              '补全脚本已安装且是最新版本。',
+              'Fish 会自动加载补全 - 应立即可用。',
             ],
           };
         }
@@ -74,11 +74,11 @@ export class FishInstaller {
         isUpdate = true;
       } catch (error: any) {
         // File doesn't exist or can't be read, proceed with installation
-        console.debug(`Unable to read existing completion file at ${targetPath}: ${error.message}`);
+        console.debug(`无法读取已存在的补全文件：${targetPath}: ${error.message}`);
       }
 
       if (!(await FileSystemUtils.canWriteFile(targetPath))) {
-        throw new Error(`Path is not writable: ${targetPath}`);
+        throw new Error(`路径不可写：${targetPath}`);
       }
 
       // Ensure the directory exists
@@ -95,10 +95,10 @@ export class FishInstaller {
       let message: string;
       if (isUpdate) {
         message = backupPath
-          ? 'Completion script updated successfully (previous version backed up)'
-          : 'Completion script updated successfully';
+          ? '补全脚本更新成功（已备份旧版本）'
+          : '补全脚本更新成功';
       } else {
-        message = 'Completion script installed successfully for Fish';
+        message = 'Fish 补全脚本安装成功';
       }
 
       return {
@@ -107,14 +107,14 @@ export class FishInstaller {
         backupPath,
         message,
         instructions: [
-          'Fish automatically loads completions from ~/.config/fish/completions/',
-          'Completions are available immediately - no shell restart needed.',
+          'Fish 会自动从 ~/.config/fish/completions/ 加载补全',
+          '补全立即可用 - 无需重启 shell。',
         ],
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to install completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `安装补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -136,13 +136,13 @@ export class FishInstaller {
       } catch {
         return {
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         };
       }
 
       const targetDir = path.dirname(targetPath);
       if (!(await FileSystemUtils.canWriteFile(targetDir))) {
-        throw new Error(`Path is not writable: ${targetDir}`);
+        throw new Error(`路径不可写：${targetDir}`);
       }
 
       // Remove the completion script
@@ -150,12 +150,12 @@ export class FishInstaller {
 
       return {
         success: true,
-        message: 'Completion script uninstalled successfully',
+        message: '补全脚本卸载成功',
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to uninstall completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `卸载补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

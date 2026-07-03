@@ -36,7 +36,7 @@ export function validateSchemaName(
   const availableSchemas = listSchemas(projectRoot);
   if (!availableSchemas.includes(schemaName)) {
     throw new Error(
-      `Unknown schema '${schemaName}'. Available: ${availableSchemas.join(', ')}`
+      `未知 schema '${schemaName}'。可用：${availableSchemas.join(', ')}`
     );
   }
   return schemaName;
@@ -64,7 +64,7 @@ export function writeChangeMetadata(
   const parseResult = ChangeMetadataSchema.safeParse(metadata);
   if (!parseResult.success) {
     throw new ChangeMetadataError(
-      `Invalid metadata: ${parseResult.error.message}`,
+      `无效的元数据：${parseResult.error.message}`,
       metaPath
     );
   }
@@ -76,7 +76,7 @@ export function writeChangeMetadata(
   } catch (err) {
     const ioError = err instanceof Error ? err : new Error(String(err));
     throw new ChangeMetadataError(
-      `Failed to write metadata: ${ioError.message}`,
+      `写入元数据失败：${ioError.message}`,
       metaPath,
       ioError
     );
@@ -107,7 +107,7 @@ export function readChangeMetadata(
   } catch (err) {
     const ioError = err instanceof Error ? err : new Error(String(err));
     throw new ChangeMetadataError(
-      `Failed to read metadata: ${ioError.message}`,
+      `读取元数据失败：${ioError.message}`,
       metaPath,
       ioError
     );
@@ -119,7 +119,7 @@ export function readChangeMetadata(
   } catch (err) {
     const parseError = err instanceof Error ? err : new Error(String(err));
     throw new ChangeMetadataError(
-      `Invalid YAML in metadata file: ${parseError.message}`,
+      `元数据文件中的 YAML 无效：${parseError.message}`,
       metaPath,
       parseError
     );
@@ -129,7 +129,7 @@ export function readChangeMetadata(
   const parseResult = ChangeMetadataSchema.safeParse(parsed);
   if (!parseResult.success) {
     throw new ChangeMetadataError(
-      `Invalid metadata: ${parseResult.error.message}`,
+      `无效的元数据：${parseResult.error.message}`,
       metaPath
     );
   }
@@ -138,7 +138,7 @@ export function readChangeMetadata(
   const availableSchemas = listSchemas(projectRoot);
   if (!availableSchemas.includes(parseResult.data.schema)) {
     throw new ChangeMetadataError(
-      `Unknown schema '${parseResult.data.schema}'. Available: ${availableSchemas.join(', ')}`,
+      `未知 schema '${parseResult.data.schema}'。可用：${availableSchemas.join(', ')}`,
       metaPath
     );
   }

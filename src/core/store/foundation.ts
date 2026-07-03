@@ -178,13 +178,13 @@ function storeStateDiagnostic(label: string): {
   return {
     code: 'invalid_store_registry',
     target: 'store.registry',
-    fix: `Repair or remove ${getStoreRegistryPath({})}.`,
+    fix: `修复或移除 ${getStoreRegistryPath({})}。`,
   };
 }
 
 function invalidStoreStateError(label: string, message: string): StoreError {
   const diagnostic = storeStateDiagnostic(label);
-  return new StoreError(`Invalid ${label}: ${message}`, diagnostic.code, {
+  return new StoreError(`无效的 ${label}：${message}`, diagnostic.code, {
     target: diagnostic.target,
     fix: diagnostic.fix,
   });
@@ -321,8 +321,8 @@ export async function writeStoreRegistryState(
 }
 
 const storeRegistryLockError = makeLockErrorFactory({
-  createSubject: 'the registry lock file',
-  busyMessage: 'Store registry is busy.',
+  createSubject: '注册表锁文件',
+  busyMessage: 'Store 注册表正忙。',
   code: 'store_registry_busy',
   target: 'store.registry',
 });
@@ -402,7 +402,7 @@ export async function resolveGitStoreBackendConfig(
   }
 
   if (input.branch !== undefined && input.branch.length === 0) {
-    throw new Error('Store branch must not be empty when provided.');
+    throw new Error('提供 Store branch 时不能为空。');
   }
 
   return {

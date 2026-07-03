@@ -9,7 +9,7 @@ export class ViewCommand {
     const openspecDir = path.join(targetPath, 'openspec');
     
     if (!fs.existsSync(openspecDir)) {
-      console.error(chalk.red('No openspec directory found'));
+      console.error(chalk.red('未找到 openspec 目录'));
       process.exit(1);
     }
 
@@ -184,17 +184,17 @@ export class ViewCommand {
       // This is a simplification
     });
 
-    console.log(chalk.bold('Summary:'));
+    console.log(chalk.bold('摘要：'));
     console.log(
-      `  ${chalk.cyan('●')} Specifications: ${chalk.bold(totalSpecs)} specs, ${chalk.bold(totalRequirements)} requirements`
+      `  ${chalk.cyan('●')} 规范：${chalk.bold(totalSpecs)} 个 spec，${chalk.bold(totalRequirements)} 个需求`
     );
     if (changesData.draft.length > 0) {
-      console.log(`  ${chalk.gray('●')} Draft Changes: ${chalk.bold(changesData.draft.length)}`);
+      console.log(`  ${chalk.gray('●')} 草稿变更：${chalk.bold(changesData.draft.length)}`);
     }
     console.log(
-      `  ${chalk.yellow('●')} Active Changes: ${chalk.bold(changesData.active.length)} in progress`
+      `  ${chalk.yellow('●')} 活跃变更：${chalk.bold(changesData.active.length)} 个进行中`
     );
-    console.log(`  ${chalk.green('●')} Completed Changes: ${chalk.bold(changesData.completed.length)}`);
+    console.log(`  ${chalk.green('●')} 已完成变更：${chalk.bold(changesData.completed.length)}`);
 
     if (totalTasks > 0) {
       const overallProgress = Math.round((completedTasks / totalTasks) * 100);

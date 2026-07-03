@@ -27,7 +27,7 @@ export function parseSchema(yamlContent: string): SchemaYaml {
   const result = SchemaYamlSchema.safeParse(parsed);
   if (!result.success) {
     const errors = result.error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
-    throw new SchemaValidationError(`Invalid schema: ${errors}`);
+    throw new SchemaValidationError(`无效的 schema：${errors}`);
   }
 
   const schema = result.data;
@@ -67,7 +67,7 @@ function validateRequiresReferences(artifacts: Artifact[]): void {
     for (const req of artifact.requires) {
       if (!validIds.has(req)) {
         throw new SchemaValidationError(
-          `Invalid dependency reference in artifact '${artifact.id}': '${req}' does not exist`
+          `产出物 '${artifact.id}' 中的依赖引用无效：'${req}' 不存在`
         );
       }
     }
@@ -117,7 +117,7 @@ function validateNoCycles(artifacts: Artifact[]): void {
     if (!visited.has(artifact.id)) {
       const cycle = dfs(artifact.id);
       if (cycle) {
-        throw new SchemaValidationError(`Cyclic dependency detected: ${cycle}`);
+        throw new SchemaValidationError(`检测到循环依赖：${cycle}`);
       }
     }
   }

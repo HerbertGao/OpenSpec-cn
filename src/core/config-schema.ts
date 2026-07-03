@@ -50,7 +50,7 @@ export function validateConfigKeyPath(path: string): { valid: boolean; reason?: 
 
   const rootKey = rawKeys[0];
   if (!KNOWN_TOP_LEVEL_KEYS.has(rootKey)) {
-    return { valid: false, reason: `Unknown top-level key "${rootKey}"` };
+    return { valid: false, reason: `未知的顶层键 "${rootKey}"` };
   }
 
   if (rootKey === 'featureFlags') {

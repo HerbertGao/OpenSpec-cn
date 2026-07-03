@@ -80,7 +80,7 @@ describe('openers core', () => {
           error as { diagnostic: { code: string; fix?: string } }
         ).diagnostic;
         expect(diagnostic.code).toBe('invalid_opener_config');
-        expect(diagnostic.fix).toContain("'workspace-file' or 'attach-dirs'");
+        expect(diagnostic.fix).toContain("'workspace-file' 或 'attach-dirs'");
         expect(diagnostic.fix).toContain(CONFIG_PATH);
       }
     });
@@ -93,11 +93,11 @@ describe('openers core', () => {
 
     it('rejects malformed rows instead of ignoring them', () => {
       expect(() => mergeOpenerTable('zed', CONFIG_PATH)).toThrowError(
-        /Invalid openers config/
+        /无效的 openers 配置/
       );
       expect(() =>
         mergeOpenerTable({ zed: { style: 'workspace-file', extra: 1 } }, CONFIG_PATH)
-      ).toThrowError(/Invalid openers config/);
+      ).toThrowError(/无效的 openers 配置/);
     });
   });
 

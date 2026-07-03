@@ -176,7 +176,7 @@ export async function confirmRemoveInteractively(
 ): Promise<boolean> {
   const { confirm } = await import('@inquirer/prompts');
 
-  console.log(`Workset '${workset.name}':`);
+  console.log(`工作集 '${workset.name}'：`);
   for (const row of formatMemberRows(workset.members)) {
     console.log(`  ${row}`);
   }

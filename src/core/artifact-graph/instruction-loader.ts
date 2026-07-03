@@ -187,7 +187,7 @@ export function loadTemplate(
 
   if (!fs.existsSync(templatePathOnDisk)) {
     throw new TemplateLoadError(
-      `Template not found: ${templatePathOnDisk}`,
+      `未找到模板：${templatePathOnDisk}`,
       templatePathOnDisk
     );
   }
@@ -199,7 +199,7 @@ export function loadTemplate(
   } catch (err) {
     const ioError = err instanceof Error ? err : new Error(String(err));
     throw new TemplateLoadError(
-      `Failed to read template: ${ioError.message}`,
+      `读取模板失败：${ioError.message}`,
       fullPath
     );
   }

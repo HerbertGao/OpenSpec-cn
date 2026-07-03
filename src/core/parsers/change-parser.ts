@@ -23,11 +23,11 @@ export class ChangeParser extends MarkdownParser {
     const whatChanges = this.findSection(sections, 'What Changes')?.content || '';
     
     if (!why) {
-      throw new Error('Change must have a Why section');
+      throw new Error('Change 必须包含 Why 章节');
     }
-    
+
     if (!whatChanges) {
-      throw new Error('Change must have a What Changes section');
+      throw new Error('Change 必须包含 What Changes 章节');
     }
 
     // Parse deltas from the What Changes section (simple format)
@@ -139,7 +139,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'RENAMED' as DeltaOperation,
-          description: `Rename requirement from "${rename.from}" to "${rename.to}"`,
+          description: `将需求 "${rename.from}" 重命名为 "${rename.to}"`,
           rename,
         });
       });

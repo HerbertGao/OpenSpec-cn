@@ -35,8 +35,8 @@ export class PowerShellInstaller {
     // UTF-16 BE BOM: FE FF — not natively supported by Node
     if (buffer.length >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff) {
       throw new Error(
-        'File is encoded as UTF-16 BE which is not supported. ' +
-          'Please re-save as UTF-8 or UTF-16 LE, then retry.',
+        '文件编码为 UTF-16 BE，不支持。' +
+          '请重新保存为 UTF-8 或 UTF-16 LE，然后重试。',
       );
     }
     // UTF-8 BOM: EF BB BF
@@ -183,7 +183,7 @@ export class PowerShellInstaller {
 
         if (!profileExists) {
           if (!(await FileSystemUtils.canWriteFile(profilePath))) {
-            throw new Error(`Path is not writable: ${profilePath}`);
+            throw new Error(`路径不可写：${profilePath}`);
           }
           await fs.mkdir(profileDir, { recursive: true });
         }
@@ -202,7 +202,7 @@ export class PowerShellInstaller {
           if (err?.code === 'ENOENT') {
             // keep defaults
           } else {
-            console.warn(`Warning: Skipping ${profilePath}: ${err?.message ?? String(err)}`);
+            console.warn(`警告：跳过 ${profilePath}：${err?.message ?? String(err)}`);
             continue;
           }
         }
@@ -224,13 +224,13 @@ export class PowerShellInstaller {
 
         const newContent = profileContent + openspecBlock;
         if (!(await FileSystemUtils.canWriteFile(profilePath))) {
-          throw new Error(`Path is not writable: ${profilePath}`);
+          throw new Error(`路径不可写：${profilePath}`);
         }
         await this.writeProfileFile(profilePath, newContent, fileEncoding, fileBom);
         anyConfigured = true;
       } catch (error) {
         // Continue to next profile if this one fails
-        console.warn(`Warning: Could not configure ${profilePath}: ${error}`);
+        console.warn(`警告：无法配置 ${profilePath}：${error}`);
       }
     }
 
@@ -262,7 +262,7 @@ export class PowerShellInstaller {
           if (err?.code === 'ENOENT') {
             continue; // Profile doesn't exist, nothing to remove
           }
-          console.warn(`Warning: Could not read ${profilePath}: ${err?.message ?? String(err)}`);
+          console.warn(`警告：无法读取 ${profilePath}：${err?.message ?? String(err)}`);
           continue;
         }
 
@@ -277,7 +277,7 @@ export class PowerShellInstaller {
 
         const endIndex = profileContent.indexOf(endMarker, startIndex);
         if (endIndex === -1) {
-          console.warn(`Warning: Found start marker but no end marker in ${profilePath}`);
+          console.warn(`警告：在 ${profilePath} 中找到起始标记但未找到结束标记`);
           continue;
         }
 
@@ -289,12 +289,12 @@ export class PowerShellInstaller {
         const newContent = (beforeBlock.trimEnd() + '\n' + afterBlock.trimStart()).trim() + '\n';
 
         if (!(await FileSystemUtils.canWriteFile(profilePath))) {
-          throw new Error(`Path is not writable: ${profilePath}`);
+          throw new Error(`路径不可写：${profilePath}`);
         }
         await this.writeProfileFile(profilePath, newContent, fileEncoding, fileBom);
         anyRemoved = true;
       } catch (error) {
-        console.warn(`Warning: Could not clean ${profilePath}: ${error}`);
+        console.warn(`警告：无法清理 ${profilePath}：${error}`);
       }
     }
 
@@ -320,10 +320,10 @@ export class PowerShellInstaller {
           return {
             success: true,
             installedPath: targetPath,
-            message: 'Completion script is already installed (up to date)',
+            message: '补全脚本已安装（已是最新）',
             instructions: [
-              'The completion script is already installed and up to date.',
-              'If completions are not working, try restarting PowerShell or run: . $PROFILE',
+              '补全脚本已安装且是最新版本。',
+              '如果补全不工作，尝试重启 PowerShell 或运行：. $PROFILE',
             ],
           };
         }
@@ -331,11 +331,11 @@ export class PowerShellInstaller {
         isUpdate = true;
       } catch (error: any) {
         // File doesn't exist or can't be read, proceed with installation
-        console.debug(`Unable to read existing completion file at ${targetPath}: ${error.message}`);
+        console.debug(`无法读取已存在的补全文件：${targetPath}: ${error.message}`);
       }
 
       if (!(await FileSystemUtils.canWriteFile(targetPath))) {
-        throw new Error(`Path is not writable: ${targetPath}`);
+        throw new Error(`路径不可写：${targetPath}`);
       }
 
       // Ensure the directory exists
@@ -358,12 +358,12 @@ export class PowerShellInstaller {
       let message: string;
       if (isUpdate) {
         message = backupPath
-          ? 'Completion script updated successfully (previous version backed up)'
-          : 'Completion script updated successfully';
+          ? '补全脚本更新成功（已备份旧版本）'
+          : '补全脚本更新成功';
       } else {
         message = profileConfigured
-          ? 'Completion script installed and PowerShell profile configured successfully'
-          : 'Completion script installed successfully for PowerShell';
+          ? '补全脚本安装成功且 PowerShell profile 已配置'
+          : 'PowerShell 补全脚本安装成功';
       }
 
       return {
@@ -377,7 +377,7 @@ export class PowerShellInstaller {
     } catch (error) {
       return {
         success: false,
-        message: `Failed to install completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `安装补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -392,16 +392,16 @@ export class PowerShellInstaller {
     const profilePath = this.getProfilePath();
 
     return [
-      'Completion script installed successfully.',
+      '补全脚本安装成功。',
       '',
-      `To enable completions, add the following to your PowerShell profile (${profilePath}):`,
+      `要启用补全，请将以下内容添加到你的 PowerShell profile（${profilePath}）：`,
       '',
       '  # Source OpenSpec completions',
       `  if (Test-Path "${installedPath}") {`,
       `      . "${installedPath}"`,
       '  }',
       '',
-      'Then restart PowerShell or run: . $PROFILE',
+      '然后重启 PowerShell 或运行：. $PROFILE',
     ];
   }
 
@@ -422,13 +422,13 @@ export class PowerShellInstaller {
       } catch {
         return {
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         };
       }
 
       const targetDir = path.dirname(targetPath);
       if (!(await FileSystemUtils.canWriteFile(targetDir))) {
-        throw new Error(`Path is not writable: ${targetDir}`);
+        throw new Error(`路径不可写：${targetDir}`);
       }
 
       // Remove the completion script
@@ -439,12 +439,12 @@ export class PowerShellInstaller {
 
       return {
         success: true,
-        message: 'Completion script uninstalled successfully',
+        message: '补全脚本卸载成功',
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to uninstall completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `卸载补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

@@ -6,23 +6,23 @@ import type { FlagDefinition } from './types.js';
 export const COMMON_FLAGS = {
   json: {
     name: 'json',
-    description: 'Output as JSON',
+    description: '以 JSON 格式输出',
   } as FlagDefinition,
   jsonValidation: {
     name: 'json',
-    description: 'Output validation results as JSON',
+    description: '以 JSON 格式输出验证结果',
   } as FlagDefinition,
   strict: {
     name: 'strict',
-    description: 'Enable strict validation mode',
+    description: '启用严格验证模式',
   } as FlagDefinition,
   noInteractive: {
     name: 'no-interactive',
-    description: 'Disable interactive prompts',
+    description: '禁用交互式提示',
   } as FlagDefinition,
   type: {
     name: 'type',
-    description: 'Specify item type when ambiguous',
+    description: '当项目类型不明确时指定类型',
     takesValue: true,
     values: ['change', 'spec'],
   } as FlagDefinition,

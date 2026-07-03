@@ -29,7 +29,7 @@ describe('Validation Schemas', () => {
       const result = ScenarioSchema.safeParse(scenario);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Scenario text cannot be empty');
+        expect(result.error.issues[0].message).toBe('场景文本不能为空');
       }
     });
   });
@@ -62,7 +62,7 @@ describe('Validation Schemas', () => {
       const result = RequirementSchema.safeParse(requirement);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Requirement must contain SHALL or MUST keyword');
+        expect(result.error.issues[0].message).toBe('需求必须包含 SHALL 或 MUST 关键字');
       }
     });
 
@@ -75,7 +75,7 @@ describe('Validation Schemas', () => {
       const result = RequirementSchema.safeParse(requirement);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Requirement must have at least one scenario');
+        expect(result.error.issues[0].message).toBe('需求必须至少有一个场景');
       }
     });
   });
@@ -111,7 +111,7 @@ describe('Validation Schemas', () => {
       const result = SpecSchema.safeParse(spec);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Spec must have at least one requirement');
+        expect(result.error.issues[0].message).toBe('Spec 必须至少有一个需求');
       }
     });
   });
@@ -152,7 +152,7 @@ describe('Validation Schemas', () => {
       const result = ChangeSchema.safeParse(change);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Why section must be at least 50 characters');
+        expect(result.error.issues[0].message).toBe('Why 章节必须至少 50 个字符');
       }
     });
 
@@ -173,7 +173,7 @@ describe('Validation Schemas', () => {
       const result = ChangeSchema.safeParse(change);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Consider splitting changes with more than 10 deltas');
+        expect(result.error.issues[0].message).toBe('超过 10 个 delta 时请考虑拆分 change');
       }
     });
   });
@@ -279,10 +279,10 @@ The system SHALL do B.
 
       expect(report.valid).toBe(false);
       expect(
-        report.issues.some(i => i.level === 'ERROR' && i.message.includes('Main spec contains delta header'))
+        report.issues.some(i => i.level === 'ERROR' && i.message.includes('主 spec 包含 delta 标题'))
       ).toBe(true);
       expect(
-        report.issues.some(i => i.level === 'ERROR' && i.message.includes('Requirement header "### Requirement: B" appears outside'))
+        report.issues.some(i => i.level === 'ERROR' && i.message.includes('需求标题 "### Requirement: B" 出现在主'))
       ).toBe(true);
     });
 
@@ -317,7 +317,7 @@ The system SHALL do B.
 
       expect(report.valid).toBe(false);
       expect(
-        report.issues.some(i => i.level === 'ERROR' && i.message.includes('Requirement header "### Requirement: B" appears outside'))
+        report.issues.some(i => i.level === 'ERROR' && i.message.includes('需求标题 "### Requirement: B" 出现在主'))
       ).toBe(true);
     });
 
@@ -349,8 +349,8 @@ The system SHALL ...
       const report = await new Validator().validateSpec(specPath);
 
       expect(report.valid).toBe(true);
-      expect(report.issues.some(i => i.message.includes('Main spec contains delta header'))).toBe(false);
-      expect(report.issues.some(i => i.message.includes('appears outside the main ## Requirements section'))).toBe(false);
+      expect(report.issues.some(i => i.message.includes('主 spec 包含 delta 标题'))).toBe(false);
+      expect(report.issues.some(i => i.message.includes('出现在主 ## Requirements section'))).toBe(false);
     });
   });
 
@@ -532,7 +532,7 @@ The system will log all events.
 
       expect(report.valid).toBe(false);
       expect(report.summary.errors).toBeGreaterThan(0);
-      expect(report.issues.some(i => i.message.includes('must contain SHALL or MUST'))).toBe(true);
+      expect(report.issues.some(i => i.message.includes('必须包含 SHALL 或 MUST'))).toBe(true);
     });
 
     it('should hint the author when ADDED requirement only has SHALL/MUST in the header', async () => {
@@ -559,8 +559,8 @@ Error handling logic goes here.
       const report = await validator.validateChangeDeltaSpecs(changeDir);
 
       expect(report.valid).toBe(false);
-      const shallMessage = report.issues.find(i => i.message.includes('must contain SHALL or MUST'));
-      expect(shallMessage?.message).toContain('not only in the header');
+      const shallMessage = report.issues.find(i => i.message.includes('必须包含 SHALL 或 MUST'));
+      expect(shallMessage?.message).toContain('而非仅在标题中');
       expect(shallMessage?.message).toContain('### Requirement:');
     });
 
@@ -588,8 +588,8 @@ Please describe how validation should work here.
       const report = await validator.validateChangeDeltaSpecs(changeDir);
 
       expect(report.valid).toBe(false);
-      const shallMessage = report.issues.find(i => i.message.includes('must contain SHALL or MUST'));
-      expect(shallMessage?.message).toContain('not only in the header');
+      const shallMessage = report.issues.find(i => i.message.includes('必须包含 SHALL 或 MUST'));
+      expect(shallMessage?.message).toContain('而非仅在标题中');
       expect(shallMessage?.message).toContain('### Requirement:');
     });
 
@@ -617,8 +617,8 @@ The system will log all events.
       const report = await validator.validateChangeDeltaSpecs(changeDir);
 
       expect(report.valid).toBe(false);
-      const shallMessage = report.issues.find(i => i.message.includes('must contain SHALL or MUST'));
-      expect(shallMessage?.message).not.toContain('not only in the header');
+      const shallMessage = report.issues.find(i => i.message.includes('必须包含 SHALL 或 MUST'));
+      expect(shallMessage?.message).not.toContain('而非仅在标题中');
     });
 
     it('should handle requirements without metadata fields', async () => {

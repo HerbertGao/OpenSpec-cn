@@ -100,11 +100,11 @@ const OpenersConfigSchema = z.record(z.string(), OpenerConfigRowSchema);
 
 function invalidOpenerConfigError(message: string, configPath: string): StoreError {
   return new StoreError(
-    `Invalid openers config: ${message}`,
+    `无效的 openers 配置：${message}`,
     'invalid_opener_config',
     {
       target: 'openers.config',
-      fix: `Each entry under "openers" in ${configPath} may set style ('workspace-file' or 'attach-dirs'), label, command, args, and attach_flag; new tools must set style.`,
+      fix: `${configPath} 中 "openers" 下的每个条目可设置 style（'workspace-file' 或 'attach-dirs'）、label、command、args 和 attach_flag；新工具必须设置 style。`,
     }
   );
 }
