@@ -5,6 +5,13 @@ on:
     tags:
       - 'v*.*.*'
 
+# OIDC trusted publishing to npm (token-free). Requires a Trusted Publisher
+# configured on npmjs.com for this package pointing at this repo + workflow.
+# See PR description / docs/publishing.md for the one-time npm-side setup.
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -18,10 +25,11 @@ jobs:
         with:
           version: 9
 
+      # Node >= 22.14 is required for npm OIDC trusted publishing.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.19.0'
+          node-version: '22'
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org/'
 
@@ -31,7 +39,16 @@ jobs:
       - name: Build package
         run: pnpm run build
 
-      - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm run release:ci
+      # npm CLI >= 11.5.1 is required for OIDC trusted publishing; the version
+      # bundled with Node 22 is older, so upgrade it explicitly.
+      - name: Upgrade npm (OIDC support)
+        run: npm install -g npm@latest
+
+      - name: Verify packed version matches package.json
+        run: pnpm run check:pack-version
+
+      # Publish with npm (not pnpm): pnpm's OIDC support is unreliable.
+      # No NODE_AUTH_TOKEN — auth is via GitHub OIDC + the configured
+      # Trusted Publisher. Provenance attestations are attached automatically.
+      - name: Publish to npm (OIDC trusted publishing)
+        run: npm publish --access public
