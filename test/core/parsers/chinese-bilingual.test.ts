@@ -82,6 +82,22 @@ The system SHALL authenticate.
       expect(change.deltas[2].operation).toBe('REMOVED');
       expect(change.deltas[3].operation).toBe('RENAMED');
     });
+
+    it('does not classify 更新 (update) as ADDED — bare 新 was narrowed to 新增/新建', () => {
+      const content = `# 变更
+
+## 为什么
+因为我们需要更新现有端点，理由充分且足够长以通过校验。
+
+## 变更内容
+- **api:** 更新认证端点
+- **svc:** 新建服务模块`;
+
+      const change = new MarkdownParser(content).parseChange('c');
+      expect(change.deltas).toHaveLength(2);
+      expect(change.deltas[0].operation).toBe('MODIFIED'); // 更新 → not ADDED
+      expect(change.deltas[1].operation).toBe('ADDED'); // 新建 → ADDED
+    });
   });
 
   describe('extractRequirementsSection', () => {
