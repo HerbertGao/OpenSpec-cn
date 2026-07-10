@@ -1,4 +1,23 @@
-# @fission-ai/openspec
+# @herbertgao/openspec-cn（团队分支）
+
+本包是 [`@studyzy/openspec-cn`](https://github.com/studyzy/OpenSpec-cn) 的团队分支，版本号与上游
+（Fission-AI/OpenSpec）保持一致；我们自己的修复在同一版本号内叠加，记录如下。上游历史见文末。
+
+### 1.5.0（团队分支修复）
+
+基线：studyzy `@studyzy/openspec-cn@1.5.0`（= 上游 Fission-AI/OpenSpec v1.5.0）。团队修复：
+
+- **修复中英文双语解析回归**（上游 [issue #31](https://github.com/studyzy/OpenSpec-cn/issues/31)）：
+  合并上游 v1.5.0 时解析/校验层退回为仅匹配英文，导致中文标题的 spec/change 无法解析、校验、归档。
+  已按 1.4.1 双语逻辑恢复匹配层——`## 目的/需求/为什么/变更内容` 章节、`### 需求:`（含全角冒号 `：`）、
+  `## 新增/修改/移除/重命名需求` delta 章节、需求关键字 `必须/禁止`、以及 delta 操作的中文识别
+  （其中把 1.4.1 过宽的裸 `新` 收窄为 `新增|新建`，避免 `更新/刷新` 被误判为 ADDED）。
+- 发布：包名改为 `@herbertgao/openspec-cn`，`release:ci` 改为直接 `pnpm publish`，并修正
+  `pack-version-check` 中硬编码的上游包路径。
+
+---
+
+## 上游历史（@fission-ai/openspec）
 
 ## 1.5.0
 
