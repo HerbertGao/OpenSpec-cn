@@ -103,6 +103,17 @@ AI：已归档至 openspec/changes/archive/2025-01-23-add-dark-mode/
 npm install -g @studyzy/openspec-cn@latest
 ```
 
+> [!NOTE]
+> **团队分支：`@herbertgao/openspec-cn`。** 本仓库在 studyzy 汉化版基础上修复了
+> 中英文双语解析回归（上游 [issue #31](https://github.com/studyzy/OpenSpec-cn/issues/31)）。
+> 团队内部请安装我们的包（命令仍为 `openspec-cn`）：
+>
+> ```bash
+> npm install -g @herbertgao/openspec-cn@latest
+> # 或免安装
+> npx @herbertgao/openspec-cn init
+> ```
+
 然后进入你的项目目录并初始化：
 
 ```bash

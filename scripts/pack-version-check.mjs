@@ -53,7 +53,7 @@ function main() {
   let tgzPath;
 
   try {
-    log(`Packing @fission-ai/openspec@${expected}...`);
+    log(`Packing ${pkg.name}@${expected}...`);
     const filename = npmPack();
     tgzPath = path.resolve(filename);
     log(`Created: ${tgzPath}`);
@@ -79,8 +79,10 @@ function main() {
     // Install the tarball
     run('npm', ['install', tgzPath, '--silent', '--no-audit', '--no-fund'], { cwd: work, env });
 
-    // Run the installed CLI via Node to avoid bin resolution/platform issues
-    const binRel = path.join('node_modules', '@fission-ai', 'openspec', 'bin', 'openspec.js');
+    // Run the installed CLI via Node to avoid bin resolution/platform issues.
+    // Derive the install path from the package name so this works for any
+    // scope/name (e.g. @herbertgao/openspec-cn), not a hardcoded upstream one.
+    const binRel = path.join('node_modules', ...pkg.name.split('/'), 'bin', 'openspec.js');
     const actual = run(process.execPath, [binRel, '--version'], { cwd: work }).trim();
 
     if (actual !== expected) {

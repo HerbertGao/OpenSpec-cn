@@ -1,7 +1,7 @@
 {
-  "name": "@studyzy/openspec-cn",
+  "name": "@herbertgao/openspec-cn",
   "version": "1.5.0",
-  "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本",
+  "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本（团队分支，含双语解析修复）",
   "keywords": [
     "openspec",
     "openspec-cn",
@@ -11,10 +11,13 @@
     "ai",
     "development"
   ],
-  "homepage": "https://github.com/studyzy/OpenSpec-cn",
+  "homepage": "https://github.com/HerbertGao/OpenSpec-cn",
   "repository": {
     "type": "git",
-    "url": "https://github.com/studyzy/OpenSpec-cn"
+    "url": "https://github.com/HerbertGao/OpenSpec-cn"
+  },
+  "bugs": {
+    "url": "https://github.com/HerbertGao/OpenSpec-cn/issues"
   },
   "license": "MIT",
   "author": "OpenSpec Contributors",
@@ -55,7 +58,7 @@
     "postinstall": "node scripts/postinstall.js",
     "check:pack-version": "node scripts/pack-version-check.mjs",
     "release": "pnpm run release:ci",
-    "release:ci": "pnpm run check:pack-version && pnpm exec changeset publish",
+    "release:ci": "pnpm run check:pack-version && pnpm publish --no-git-checks",
     "changeset": "changeset"
   },
   "engines": {
