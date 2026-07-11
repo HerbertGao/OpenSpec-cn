@@ -281,7 +281,16 @@ ${body}
   describe('findMainSpecStructureIssues bilingual (issue #31)', () => {
     it('does NOT false-flag an English requirement header inside a Chinese ## 需求 section', () => {
       const issues = findMainSpecStructureIssues('## 需求\n\n### Requirement: Foo\nThe system SHALL foo.\n');
-      expect(issues.some(i => i.kind === 'requirement-outside-requirements')).toBe(false);
+      // Assert the FULL list is empty so a mis-classification (e.g. `## 需求`
+      // wrongly matched as a delta-header) would also fail here. [review C3]
+      expect(issues).toEqual([]);
+    });
+
+    it('does NOT flag a nameless Chinese ### 需求 header (ASCII or full-width colon) as a misplaced requirement [review C3]', () => {
+      for (const header of ['### 需求：', '### 需求:']) {
+        const issues = findMainSpecStructureIssues(`## 目的\n概述。\n\n${header}\n正文。\n`);
+        expect(issues.some(i => i.kind === 'requirement-outside-requirements')).toBe(false);
+      }
     });
 
     it('flags a Chinese ### 需求： requirement placed outside the requirements section', () => {

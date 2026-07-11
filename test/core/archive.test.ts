@@ -702,6 +702,53 @@ The system SHALL support the shared rule.
       expect(archives.some(a => a.includes(changeB))).toBe(false);
     });
 
+    it('aborts a MODIFIED that would drop a Chinese #### 场景 scenario (issue #1246, bilingual) [review C1]', async () => {
+      const mainSpecDir = path.join(tempDir, 'openspec', 'specs', 'zh-drift');
+      await fs.mkdir(mainSpecDir, { recursive: true });
+      const mainSpecPath = path.join(mainSpecDir, 'spec.md');
+      await fs.writeFile(mainSpecPath, `# zh-drift Specification
+
+## 目的
+中文场景漂移保护测试，验证 #### 场景 也受 #1246 保护。
+
+## 需求
+
+### 需求：共享规则
+系统必须支持共享规则。
+
+#### 场景：老场景
+- **当** 原有行为运行
+- **则** 成功
+
+#### 场景：保留场景
+- **当** 另一行为运行
+- **则** 成功`);
+
+      const changeName = 'zh-drift-change';
+      const changeSpecDir = path.join(tempDir, 'openspec', 'changes', changeName, 'specs', 'zh-drift');
+      await fs.mkdir(changeSpecDir, { recursive: true });
+      // MODIFIED keeps only 保留场景, dropping 老场景 — must abort, not silently delete.
+      await fs.writeFile(path.join(changeSpecDir, 'spec.md'), `# zh-drift Changes
+
+## 修改需求
+
+### 需求：共享规则
+系统必须支持共享规则。
+
+#### 场景：保留场景
+- **当** 另一行为运行
+- **则** 成功`);
+
+      await archiveCommand.execute(changeName, { yes: true, noValidate: true });
+
+      // Before the fix parseScenarioBlocks matched only ASCII "Scenario:", so the
+      // gate saw zero current scenarios and silently deleted 老场景.
+      const unchanged = await fs.readFile(mainSpecPath, 'utf-8');
+      expect(unchanged).toContain('老场景');
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('老场景'));
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
+    });
+
     it('should abort with a structural error when target spec hides requirements outside ## Requirements', async () => {
       const changeName = 'hidden-requirement-target';
       const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);

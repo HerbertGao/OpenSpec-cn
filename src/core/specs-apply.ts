@@ -405,7 +405,7 @@ function parseScenarioBlocks(requirementRaw: string): ScenarioBlock[] {
   let index = 0;
 
   while (index < lines.length) {
-    const headerMatch = lines[index].match(/^####\s*Scenario:\s*(.+)\s*$/);
+    const headerMatch = lines[index].match(/^####\s*(?:Scenario|场景)[:：]\s*(.+)\s*$/);
     if (!headerMatch) {
       index++;
       continue;
@@ -414,7 +414,7 @@ function parseScenarioBlocks(requirementRaw: string): ScenarioBlock[] {
     const start = index;
     const name = headerMatch[1].trim();
     index++;
-    while (index < lines.length && !/^####\s*Scenario:\s*(.+)\s*$/.test(lines[index])) {
+    while (index < lines.length && !/^####\s*(?:Scenario|场景)[:：]\s*(.+)\s*$/.test(lines[index])) {
       index++;
     }
 
