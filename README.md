@@ -15,7 +15,7 @@
 </p>
 
 > [!NOTE]
-> 本仓库的 npm 包：**`@herbertgao/openspec-cn`**（命令 `openspec-cn`）。基于 [studyzy 汉化版](https://github.com/studyzy/OpenSpec-cn)（`@studyzy/openspec-cn`），并修复了中英文双语解析回归（上游 [issue #31](https://github.com/studyzy/OpenSpec-cn/issues/31)）。
+> 本仓库的 npm 包：**`@herbertgao/openspec-cn`**（命令 `openspec-cn`）—— 规范驱动开发框架 OpenSpec 的简体中文版本，支持中英双语解析。
 >
 > 原版项目：OpenSpec
 > 仓库：https://github.com/Fission-AI/OpenSpec
@@ -197,7 +197,7 @@ openspec-cn update
 
 **小修小补** —— Bug 修复、错别字修正与小型改进可以直接提交 PR。
 
-**汉化问题** —— 因为汉化导致的 Bug 修复、错别字修正与小型改进建议可以直接提交 [Issue](https://github.com/studyzy/OpenSpec-cn/issues)。
+**汉化问题** —— 因为汉化导致的 Bug、错别字或小型改进建议，可以直接提交 [Issue](https://github.com/HerbertGao/OpenSpec-cn/issues)。
 
 **较大改动** —— 对于新功能、重大重构或架构调整，请先提交一个 OpenSpec 变更提案，以便在实现前对齐意图与目标。
 
