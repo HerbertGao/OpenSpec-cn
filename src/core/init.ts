@@ -685,7 +685,7 @@ export class InitCommand {
       const skillCount = delivery !== 'commands' ? getSkillTemplates(workflows).length : 0;
       const commandCount = delivery !== 'skills' ? getCommandContents(workflows).length : 0;
       if (skillCount > 0 && commandCount > 0) {
-        console.log(`${skillCount} skills and ${commandCount} commands in ${toolDirs}/`);
+        console.log(`${skillCount} 个技能和 ${commandCount} 个命令，位于 ${toolDirs}/`);
       } else if (skillCount > 0) {
         console.log(`${skillCount} skills in ${toolDirs}/`);
       } else if (commandCount > 0) {

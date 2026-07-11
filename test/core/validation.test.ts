@@ -1149,7 +1149,7 @@ The system SHALL do the real thing.
 
       expect(report.valid).toBe(true);
       const info = report.issues.find(
-        i => i.level === 'INFO' && i.message.includes('missing a requirement name')
+        i => i.level === 'INFO' && i.message.includes('缺少需求名称')
       );
       expect(info).toBeDefined();
       expect(info!.message).not.toContain('Requirement: Requirement:');

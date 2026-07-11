@@ -313,7 +313,7 @@ export async function buildUpdatedSpec(
   for (const add of plan.added) {
     const key = normalizeRequirementName(add.name);
     if (nameToBlock.has(key)) {
-      throw new Error(`${specName} ADDED failed for header "### Requirement: ${add.name}" - already exists`);
+      throw new Error(`${specName} ADDED 失败，标题 "### Requirement: ${add.name}" —— 已存在`);
     }
     nameToBlock.set(key, add);
   }

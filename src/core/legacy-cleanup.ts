@@ -639,7 +639,7 @@ export function formatProjectMdMigrationHint(): string {
   const lines: string[] = [];
   lines.push(chalk.yellow.bold('需要您注意'));
   lines.push('  • openspec/project.md');
-  lines.push(chalk.dim('    We won\'t delete this file. It may contain useful project context.'));
+  lines.push(chalk.dim('    我们不会删除该文件，它可能包含有用的项目上下文。'));
   lines.push('');
   lines.push(chalk.dim('    新的 openspec/config.yaml 提供了 "context:" 小节，用于规划'));
   lines.push(chalk.dim('    上下文。它会包含在每次 OpenSpec 请求中，比旧的'));

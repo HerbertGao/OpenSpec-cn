@@ -266,7 +266,7 @@ export class FileSystemUtils {
       } else if (startIndex === -1 && endIndex === -1) {
         existingContent = startMarker + '\n' + content + '\n' + endMarker + '\n\n' + existingContent;
       } else {
-        throw new Error(`Invalid marker state in ${filePath}. Found start: ${startIndex !== -1}, Found end: ${endIndex !== -1}`);
+        throw new Error(`${filePath} 中标记状态无效。找到 start：${startIndex !== -1}，找到 end：${endIndex !== -1}`);
       }
     } else {
       existingContent = startMarker + '\n' + content + '\n' + endMarker;

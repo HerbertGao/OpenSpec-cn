@@ -8,7 +8,7 @@ const KebabIdentifierSchema = (label: string): z.ZodString =>
     if (!isKebabId(value)) {
       ctx.addIssue({
         code: 'custom',
-        message: `${label} must be kebab-case with lowercase letters, numbers, and single hyphen separators`,
+        message: `${label} 必须为 kebab-case（小写字母、数字，以单个连字符分隔）`,
       });
     }
   });
@@ -27,7 +27,7 @@ export const ChangeMetadataSchema = z.object({
   created: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, {
-      message: 'created must be YYYY-MM-DD format',
+      message: 'created 必须为 YYYY-MM-DD 格式',
     })
     .optional(),
   goal: z.string().min(1).optional(),

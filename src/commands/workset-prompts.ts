@@ -129,7 +129,7 @@ export async function composeInteractively(
   }
 
   console.log('');
-  console.log('[3/3] Choose your tool');
+  console.log('[3/3] 选择你的工具');
   let tool = input.tool;
   if (tool === undefined) {
     const choices = listOpenerChoices(table);

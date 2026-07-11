@@ -152,7 +152,7 @@ async function createSearchableMultiSelect(): Promise<
 
     // Instructions
     lines.push(
-      `  ${chalk.cyan('↑↓')} navigate • ${chalk.cyan('Space')} toggle • ${chalk.cyan('Backspace')} remove • ${chalk.cyan('Enter')} confirm`
+      `  ${chalk.cyan('↑↓')} 导航 • ${chalk.cyan('Space')} 切换 • ${chalk.cyan('Backspace')} 移除 • ${chalk.cyan('Enter')} 确认`
     );
 
     // List

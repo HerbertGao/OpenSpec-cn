@@ -154,8 +154,8 @@ export class Validator {
             path: entryPath,
             line: stray.line,
             message: nameless
-              ? `Header "### ${stray.header}" in ${stray.section} is missing a requirement name and is ignored by validation. Add a name, e.g. "### Requirement: <name>".`
-              : `Header "### ${stray.header}" in ${stray.section} is not a "### Requirement:" header and is ignored by validation. Use "### Requirement: ${stray.header}" if it should be validated as a requirement.`,
+              ? `标题 "### ${stray.header}"（位于 ${stray.section}）缺少需求名称，已被校验忽略。请补充名称，例如 "### Requirement: <name>"。`
+              : `标题 "### ${stray.header}"（位于 ${stray.section}）不是 "### Requirement:" 标题，已被校验忽略。若需作为需求校验，请使用 "### Requirement: ${stray.header}"。`,
           });
         }
 
@@ -292,7 +292,7 @@ export class Validator {
       issues.push({
         level: 'ERROR',
         path: specPath,
-        message: `Delta sections ${this.formatSectionList(sections)} were found, but no requirement entries parsed. Ensure each section includes at least one "### Requirement:" block (REMOVED may use bullet list syntax).`,
+        message: `找到 delta 章节 ${this.formatSectionList(sections)}，但未解析到任何需求条目。请确保每个章节至少包含一个 "### Requirement:" 块（REMOVED 可使用项目符号列表语法）。`,
       });
     }
     for (const path of missingHeaderSpecs) {
