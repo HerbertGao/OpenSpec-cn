@@ -1,9 +1,26 @@
-# @herbertgao/openspec-cn（团队分支）
+# @herbertgao/openspec-cn
 
-本包是 [`@studyzy/openspec-cn`](https://github.com/studyzy/OpenSpec-cn) 的团队分支，版本号与上游
-（Fission-AI/OpenSpec）保持一致；我们自己的修复在同一版本号内叠加，记录如下。上游历史见文末。
+`@herbertgao/openspec-cn` 是规范驱动开发框架 OpenSpec 的简体中文版本，支持中英双语解析。
+版本号与上游 Fission-AI/OpenSpec 保持一致；本项目自己的改动记录如下，上游历史见文末。
 
-### 1.5.0（团队分支修复）
+## 1.6.0
+
+基线：上游 Fission-AI/OpenSpec v1.6.0（经 v1.6.0-beta.1 合入；正式版与 beta.1 代码零差异，仅版本号/CHANGELOG）。
+
+上游 v1.6.0 主要变更（已随合并汉化）：
+
+- 新增 **TRAE 命令适配器**、**Oh My Pi** 支持、`/opsx:update`（就地更新变更的计划工件）。
+- `archive` 在人类模式被阻断时返回**非零退出码**；`validate <change>` 按目录存在性解析（对齐 `status`）。
+- **需求读取保真度统一**：`validate`/`archive` 走同一套围栏、元数据、多行感知的提取逻辑。
+- **更安全的需求归档**：阻止过期 `MODIFIED` 静默删除先前归档新增的场景（上游 #1246 漂移门）。
+
+本项目工作：
+
+- **中英文双语解析**：结构诊断正则、场景漂移保护、无名头处理等均支持中英双语；v1.6.0 新功能文案一并汉化。
+- 归档场景漂移保护改为**围栏感知**并收紧场景名捕获。
+- 发布：迁移到 npm **OIDC 可信发布**（免 token）；预发版走 `beta` dist-tag、正式版走 `latest`。
+
+## 1.5.0
 
 基线：studyzy `@studyzy/openspec-cn@1.5.0`（= 上游 Fission-AI/OpenSpec v1.5.0）。团队修复：
 

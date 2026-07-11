@@ -20,10 +20,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # No `version:` — pnpm/action-setup@v4 reads it from package.json's
+      # `packageManager` field (pnpm@9.15.9). Passing both now errors with
+      # ERR_PNPM_BAD_PM_VERSION (as the other workflows already avoid).
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       # Node >= 22.14 is required for npm OIDC trusted publishing.
       - name: Setup Node.js
