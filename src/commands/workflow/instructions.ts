@@ -209,7 +209,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   // Project context (AI constraint - do not include in output)
   if (context) {
     console.log('<project_context>');
-    console.log('<!-- This is background information for you. Do NOT include this in your output. -->');
+    console.log('<!-- 这是供你参考的背景信息。请勿将其包含在你的输出中。 -->');
     console.log(context);
     console.log('</project_context>');
     console.log();
@@ -224,7 +224,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   // Rules (AI constraint - do not include in output)
   if (rules && rules.length > 0) {
     console.log('<rules>');
-    console.log('<!-- These are constraints for you to follow. Do NOT include this in your output. -->');
+    console.log('<!-- 这些是你需要遵循的约束。请勿将其包含在你的输出中。 -->');
     for (const rule of rules) {
       console.log(`- ${rule}`);
     }
@@ -265,14 +265,14 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
 
   // Template
   console.log('<template>');
-  console.log('<!-- Use this as the structure for your output file. Fill in the sections. -->');
+  console.log('<!-- 以此作为输出文件的结构，填写各个部分。 -->');
   console.log(template.trim());
   console.log('</template>');
   console.log();
 
   // Success criteria placeholder
   console.log('<success_criteria>');
-  console.log('<!-- To be defined in schema validation rules -->');
+  console.log('<!-- 待在 schema 校验规则中定义 -->');
   console.log('</success_criteria>');
   console.log();
 
@@ -400,12 +400,12 @@ export async function generateApplyInstructions(
     // Tracking file configured but doesn't exist yet
     const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file is missing and must be created.\nUse openspec-continue-change to generate the tracking file.`;
+    instruction = `缺少 ${tracksFilename} 文件，必须先创建。\n请使用 openspec-continue-change 生成跟踪文件。`;
   } else if (tracksFile && tracksFileExists && total === 0) {
     // Tracking file exists but contains no tasks
     const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file exists but contains no tasks.\nAdd tasks to ${tracksFilename} or regenerate it with openspec-continue-change.`;
+    instruction = `${tracksFilename} 文件存在但不含任何任务。\n请向 ${tracksFilename} 添加任务，或用 openspec-continue-change 重新生成。`;
   } else if (tracksFile && remaining === 0 && total > 0) {
     state = 'all_done';
     instruction = '所有任务已完成！此变更可以归档了。\n归档前请考虑运行测试并审查变更。';
