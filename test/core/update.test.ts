@@ -590,7 +590,7 @@ Old instructions content
   });
 
   describe('smart update detection', () => {
-    it('should show "up to date" message when skills have current version', async () => {
+    it('should show "均为最新" message when skills have current version', async () => {
       // Initialize full core profile output so there is no profile/delivery drift.
       const initCommand = new InitCommand({ tools: 'claude', force: true });
       await initCommand.execute(testDir);
@@ -600,7 +600,7 @@ Old instructions content
       await updateCommand.execute(testDir);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('up to date')
+        expect.stringContaining('均为最新')
       );
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('--force')
@@ -694,7 +694,7 @@ Old version content
   });
 
   describe('--force flag', () => {
-    it('should update when force is true even if up to date', async () => {
+    it('should update when force is true even if 均为最新', async () => {
       // Set up a configured tool with current version
       const skillsDir = path.join(testDir, '.claude', 'skills');
       await fs.mkdir(path.join(skillsDir, 'openspec-explore'), {
@@ -846,7 +846,7 @@ metadata:
         expect.stringContaining('正在更新 1 个工具')
       );
 
-      // Should mention Cursor is already up to date
+      // Should mention Cursor is already 均为最新
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('已是最新：cursor')
       );
@@ -889,7 +889,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show marker removal message (config files are never deleted, only have markers removed)
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed OpenSpec markers from CLAUDE.md')
+        expect.stringContaining('已从 CLAUDE.md 移除 OpenSpec 标记')
       );
 
       // Config file should still exist (never deleted)
@@ -936,7 +936,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show warning about --force
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Run with --force to auto-cleanup')
+        expect.stringContaining('使用 --force 自动清理')
       );
 
       // Should continue with update
@@ -980,7 +980,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show cleanup message for directory
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed .claude/commands/openspec/')
+        expect.stringContaining('已删除 .claude/commands/openspec/')
       );
 
       // Legacy directory should be deleted
@@ -1015,7 +1015,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show cleanup message
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed openspec/AGENTS.md')
+        expect.stringContaining('已删除 openspec/AGENTS.md')
       );
 
       // Legacy file should be deleted
@@ -1088,7 +1088,7 @@ More user content after markers.
 
       // Should show marker removal message
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed OpenSpec markers from CLAUDE.md')
+        expect.stringContaining('已从 CLAUDE.md 移除 OpenSpec 标记')
       );
 
       // File should still exist
@@ -1218,7 +1218,7 @@ More user content after markers.
 
       // Legacy cleanup should happen
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed .claude/commands/openspec/')
+        expect.stringContaining('已删除 .claude/commands/openspec/')
       );
 
       // Should NOT show "从旧版制品中检测到的工具" because claude is already configured
@@ -1539,7 +1539,7 @@ More user content after markers.
       )).toBe(false);
     });
 
-    it('should apply config sync when templates are up to date', async () => {
+    it('should apply config sync when templates are 均为最新', async () => {
       setMockConfig({
         featureFlags: {},
         profile: 'core',

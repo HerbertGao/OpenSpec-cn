@@ -147,7 +147,7 @@ async function createSearchableMultiSelect(): Promise<
 
     // Search box
     lines.push(
-      `  Search: ${chalk.yellow('[')}${searchText || chalk.dim('type to filter')}${chalk.yellow(']')}`
+      `  搜索：${chalk.yellow('[')}${searchText || chalk.dim('输入以筛选')}${chalk.yellow(']')}`
     );
 
     // Instructions
@@ -157,7 +157,7 @@ async function createSearchableMultiSelect(): Promise<
 
     // List
     if (filteredChoices.length === 0) {
-      lines.push(chalk.yellow('  No matches'));
+      lines.push(chalk.yellow('  无匹配项'));
     } else {
       // Calculate pagination
       const startIndex = Math.max(
