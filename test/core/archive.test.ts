@@ -749,6 +749,55 @@ The system SHALL support the shared rule.
       expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
     });
 
+    it('does NOT false-abort when a "dropped" #### 场景 only lived inside a fenced code block [review Codex#1]', async () => {
+      const mainSpecDir = path.join(tempDir, 'openspec', 'specs', 'fenced-scenario');
+      await fs.mkdir(mainSpecDir, { recursive: true });
+      await fs.writeFile(path.join(mainSpecDir, 'spec.md'), [
+        '# fenced-scenario Specification',
+        '',
+        '## 目的',
+        '围栏代码块内的示例场景不应被 #1246 漂移保护计为真实场景。',
+        '',
+        '## 需求',
+        '',
+        '### 需求：规则',
+        '系统必须支持该规则。',
+        '',
+        '#### 场景：真实场景',
+        '- **当** 行为运行',
+        '- **则** 成功',
+        '',
+        '```markdown',
+        '#### 场景：文档示例',
+        '仅为文档，并非真实场景',
+        '```',
+      ].join('\n'));
+
+      const changeName = 'fenced-modify';
+      const changeSpecDir = path.join(tempDir, 'openspec', 'changes', changeName, 'specs', 'fenced-scenario');
+      await fs.mkdir(changeSpecDir, { recursive: true });
+      // MODIFIED keeps the one REAL scenario; the fenced example is not a scenario,
+      // so there is no drift and archive must succeed (pre-fix it false-aborted).
+      await fs.writeFile(path.join(changeSpecDir, 'spec.md'), [
+        '# fenced Changes',
+        '',
+        '## 修改需求',
+        '',
+        '### 需求：规则',
+        '系统必须支持该规则。',
+        '',
+        '#### 场景：真实场景',
+        '- **当** 行为运行',
+        '- **则** 成功',
+      ].join('\n'));
+
+      await archiveCommand.execute(changeName, { yes: true, noValidate: true });
+
+      expect(console.log).not.toHaveBeenCalledWith('已中止。未更改任何文件。');
+      const archived = await fs.readdir(path.join(tempDir, 'openspec', 'changes', 'archive'));
+      expect(archived.some(a => a.includes(changeName))).toBe(true);
+    });
+
     it('should abort with a structural error when target spec hides requirements outside ## Requirements', async () => {
       const changeName = 'hidden-requirement-target';
       const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);

@@ -15,6 +15,7 @@ import {
   type RequirementBlock,
 } from './parsers/requirement-blocks.js';
 import { findMainSpecStructureIssues } from './parsers/spec-structure.js';
+import { buildCodeFenceMask } from './parsers/requirement-text.js';
 import { Validator } from './validation/validator.js';
 
 // -----------------------------------------------------------------------------
@@ -399,22 +400,30 @@ function findMissingCurrentScenarios(current: RequirementBlock, incoming: Requir
     .map((scenario) => scenario.name);
 }
 
+// Bilingual (English + Chinese, ASCII + full-width colon). `(\S.*?)` requires a
+// real name — a nameless / whitespace-only `#### 场景：` is not a scenario.
+const SCENARIO_HEADER_RE = /^####\s*(?:Scenario|场景)[:：]\s*(\S.*?)\s*$/;
+
 function parseScenarioBlocks(requirementRaw: string): ScenarioBlock[] {
   const lines = requirementRaw.replace(/\r\n?/g, '\n').split('\n');
+  // Fence-aware: a `#### Scenario:` / `#### 场景：` inside a fenced code block is
+  // a documentation example, not a real scenario — masking it keeps the #1246
+  // drift gate from false-aborting on a fenced example.
+  const fenceMask = buildCodeFenceMask(lines);
+  const isScenarioHeader = (i: number): boolean => !fenceMask[i] && SCENARIO_HEADER_RE.test(lines[i]);
   const scenarios: ScenarioBlock[] = [];
   let index = 0;
 
   while (index < lines.length) {
-    const headerMatch = lines[index].match(/^####\s*(?:Scenario|场景)[:：]\s*(.+)\s*$/);
-    if (!headerMatch) {
+    if (!isScenarioHeader(index)) {
       index++;
       continue;
     }
 
     const start = index;
-    const name = headerMatch[1].trim();
+    const name = lines[index].match(SCENARIO_HEADER_RE)![1].trim();
     index++;
-    while (index < lines.length && !/^####\s*(?:Scenario|场景)[:：]\s*(.+)\s*$/.test(lines[index])) {
+    while (index < lines.length && !isScenarioHeader(index)) {
       index++;
     }
 
