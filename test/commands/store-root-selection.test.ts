@@ -564,7 +564,7 @@ describe('store root selection for normal commands', () => {
       expect(json.archive).toBeNull();
       expect(json.status[0]).toEqual(expect.objectContaining({
         code: 'archive_change_not_found',
-        message: "Change 'missing-change' not found. No active changes exist in this root.",
+        message: "未找到变更 'missing-change'。此根目录下不存在活跃的变更。",
       }));
     });
 
