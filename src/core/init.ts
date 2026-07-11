@@ -67,6 +67,7 @@ const WORKFLOW_TO_SKILL_DIR: Record<string, string> = {
   'new': 'openspec-new-change',
   'continue': 'openspec-continue-change',
   'apply': 'openspec-apply-change',
+  'update': 'openspec-update-change',
   'ff': 'openspec-ff-change',
   'sync': 'openspec-sync-specs',
   'archive': 'openspec-archive-change',
@@ -566,8 +567,8 @@ export class InitCommand {
             const skillFile = path.join(skillDir, 'SKILL.md');
 
             // Generate SKILL.md content with YAML frontmatter including generatedBy
-            // Use hyphen-based command references for tools where filename = command name
-            const transformer = (tool.value === 'opencode' || tool.value === 'pi') ? transformToHyphenCommands : undefined;
+            // Use hyphen-based command references for tools where filename === command name (oh-my-pi, opencode, pi)
+            const transformer = (tool.value === 'opencode' || tool.value === 'pi' || tool.value === 'oh-my-pi') ? transformToHyphenCommands : undefined;
             const skillContent = generateSkillContent(template, OPENSPEC_VERSION, transformer);
 
             // Write the skill file
@@ -684,7 +685,7 @@ export class InitCommand {
       const skillCount = delivery !== 'commands' ? getSkillTemplates(workflows).length : 0;
       const commandCount = delivery !== 'skills' ? getCommandContents(workflows).length : 0;
       if (skillCount > 0 && commandCount > 0) {
-        console.log(`${skillCount} skills and ${commandCount} commands in ${toolDirs}/`);
+        console.log(`${skillCount} 个技能和 ${commandCount} 个命令，位于 ${toolDirs}/`);
       } else if (skillCount > 0) {
         console.log(`${skillCount} skills in ${toolDirs}/`);
       } else if (commandCount > 0) {

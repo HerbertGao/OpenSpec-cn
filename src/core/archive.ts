@@ -19,6 +19,15 @@ import {
   type SpecUpdate,
 } from './specs-apply.js';
 
+function isMissingPathError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as NodeJS.ErrnoException).code === 'ENOENT'
+  );
+}
+
 async function listActiveChangeNames(changesDir: string): Promise<string[]> {
   try {
     const entries = await fs.readdir(changesDir, { withFileTypes: true });
@@ -26,7 +35,8 @@ async function listActiveChangeNames(changesDir: string): Promise<string[]> {
       .filter((entry) => entry.isDirectory() && entry.name !== 'archive')
       .map((entry) => entry.name)
       .sort();
-  } catch {
+  } catch (error) {
+    if (!isMissingPathError(error)) throw error;
     return [];
   }
 }
@@ -192,20 +202,13 @@ export class ArchiveCommand {
     const archiveDir = root.archiveDir;
     const mainSpecsDir = root.specsDir;
 
-    // Check if changes directory exists
-    try {
-      await fs.access(changesDir);
-    } catch {
-      throw new Error("未找到 OpenSpec changes 目录。请先运行 'openspec-cn init'。");
-    }
-
     // Get change name interactively if not provided
     if (!changeName) {
       if (json) {
         throw new ArchiveBlockedError(
           'archive_change_name_required',
-          '需要变更名称：archive --json 为非交互模式。',
-          withStoreFlag(root, 'openspec-cn archive <change-name> --json')
+          'archive --json 为非交互模式，必须提供变更名称。',
+          withStoreFlag(root, 'openspec archive <change-name> --json')
         );
       }
       const selectedChange = await this.selectChange(changesDir);
@@ -229,7 +232,7 @@ export class ArchiveCommand {
       throw new ArchiveBlockedError(
         'archive_change_not_found',
         available.length > 0
-          ? `未找到变更 '${changeName}'。可用的变更：${available.join(', ')}`
+          ? `未找到变更 '${changeName}'。可用变更：${available.join(', ')}`
           : `未找到变更 '${changeName}'。此根目录下不存在活跃的变更。`
       );
     }
@@ -284,7 +287,7 @@ export class ArchiveCommand {
         if (!deltaReport.valid) {
           hasValidationErrors = true;
           if (!json) {
-            console.log(chalk.red(`\nValidation errors in change delta specs:`));
+            console.log(chalk.red(`\n变更 delta specs 中的验证错误：`));
             for (const issue of deltaReport.issues) {
               if (issue.level === 'ERROR') {
                 console.log(chalk.red(`  ✗ ${issue.message}`));
@@ -301,19 +304,20 @@ export class ArchiveCommand {
           throw new ArchiveBlockedError(
             'archive_validation_failed',
             `变更 '${changeName}' 验证失败。`,
-            `运行 ${withStoreFlag(root, `openspec-cn validate ${changeName}`)} 查看详情，修复错误，或使用 --no-validate 重新运行。`
+            `Run ${withStoreFlag(root, `openspec validate ${changeName}`)} 查看详情、修复错误，或使用 --no-validate 重新运行。`
           );
         }
         console.log(chalk.red('\n验证失败。归档前请修复错误。'));
         console.log(chalk.yellow('如需跳过验证（不推荐），使用 --no-validate 标志。'));
+        process.exitCode = 1;
         return null;
       }
     } else if (json) {
       if (!options.yes) {
         throw new ArchiveBlockedError(
           'archive_confirmation_required',
-          '跳过验证需要确认：使用 --yes 重新运行。',
-          withStoreFlag(root, 'openspec-cn archive <change-name> --json --no-validate --yes')
+          '跳过验证需要确认：请使用 --yes 重新运行。',
+          withStoreFlag(root, 'openspec archive <change-name> --json --no-validate --yes')
         );
       }
     } else {
@@ -334,12 +338,12 @@ export class ArchiveCommand {
         console.log(chalk.yellow(`\n⚠️  警告：跳过验证可能归档无效的 specs。`));
       }
 
-      console.log(chalk.yellow(`[${timestamp}] 已跳过变更验证：${changeName}`));
+      console.log(chalk.yellow(`[${timestamp}] 已跳过变更的验证：${changeName}`));
       console.log(chalk.yellow(`受影响的文件：${changeDir}`));
     }
 
     // Show progress and check for incomplete tasks
-    const progress = await getTaskProgressForChange(changesDir, changeName);
+    const progress = await getTaskProgressForChange(changesDir, changeName, path.resolve(changesDir, '..', '..'));
     if (!json) {
       const status = formatTaskStatus(progress);
       console.log(`任务状态：${status}`);
@@ -351,8 +355,8 @@ export class ArchiveCommand {
         if (!options.yes) {
           throw new ArchiveBlockedError(
             'archive_tasks_incomplete',
-            `为变更 '${changeName}' 找到 ${incompleteTasks} 个未完成的任务。`,
-            '完成任务或使用 --yes 重新运行。'
+            `变更 '${changeName}' 存在 ${incompleteTasks} 个未完成的任务。`,
+            '请完成任务，或使用 --yes 重新运行。'
           );
         }
       } else if (!options.yes) {
@@ -375,7 +379,7 @@ export class ArchiveCommand {
     let totals: ArchiveResult['totals'];
     if (options.skipSpecs) {
       if (!json) {
-        console.log('跳过 spec 更新（提供了 --skip-specs 标志）。');
+        console.log('跳过 spec 更新（已提供 --skip-specs 标志）。');
       }
     } else {
       // Find specs to update
@@ -383,11 +387,11 @@ export class ArchiveCommand {
 
       if (specUpdates.length > 0) {
         if (!json) {
-          console.log('\n要更新的 specs：');
+          console.log('\n待更新的 specs：');
           for (const update of specUpdates) {
-            const status = update.exists ? '更新' : '创建';
+            const status = update.exists ? 'update' : 'create';
             const capability = path.basename(path.dirname(update.target));
-            console.log(`  ${capability}：${status}`);
+            console.log(`  ${capability}: ${status}`);
           }
         }
 
@@ -396,8 +400,8 @@ export class ArchiveCommand {
           if (json) {
             throw new ArchiveBlockedError(
               'archive_confirmation_required',
-              `更新 ${specUpdates.length} 个 spec 需要确认：使用 --yes 重新运行。`,
-              withStoreFlag(root, 'openspec-cn archive <change-name> --json --yes')
+              `更新 ${specUpdates.length} 个 spec 需要确认：请使用 --yes 重新运行。`,
+              withStoreFlag(root, 'openspec archive <change-name> --json --yes')
             );
           }
           const { confirm } = await import('@inquirer/prompts');
@@ -423,11 +427,12 @@ export class ArchiveCommand {
               throw new ArchiveBlockedError(
                 'archive_spec_update_failed',
                 String(err.message || err),
-                '修复变更 delta specs 后重新运行。未更改任何文件。'
+                '请修复变更 delta specs 后重新运行。未更改任何文件。'
               );
             }
             console.log(String(err.message || err));
             console.log('已中止。未更改任何文件。');
+            process.exitCode = 1;
             return null;
           }
 
@@ -442,15 +447,16 @@ export class ArchiveCommand {
                   throw new ArchiveBlockedError(
                     'archive_spec_validation_failed',
                     `为 '${specName}' 重建的 spec 验证失败。未更改任何文件。`,
-                    `修复 change deltas 后运行 ${withStoreFlag(root, `openspec-cn validate ${specName}`)}。`
+                    `Run ${withStoreFlag(root, `openspec validate ${specName}`)} 修复变更 delta 后运行。`
                   );
                 }
-                console.log(chalk.red(`\n${specName} 重建规范中存在验证错误（不会写入更改）：`));
+                console.log(chalk.red(`\n为 ${specName} 重建的 spec 存在验证错误（不会写入更改）：`));
                 for (const issue of report.issues) {
                   if (issue.level === 'ERROR') console.log(chalk.red(`  ✗ ${issue.message}`));
                   else if (issue.level === 'WARNING') console.log(chalk.yellow(`  ⚠ ${issue.message}`));
                 }
                 console.log('已中止。未更改任何文件。');
+                process.exitCode = 1;
                 return null;
               }
             }
@@ -473,9 +479,10 @@ export class ArchiveCommand {
           totals = writeTotals;
           if (!json) {
             console.log(
-              `总计：+ ${writeTotals.added}, ~ ${writeTotals.modified}, - ${writeTotals.removed}, → ${writeTotals.renamed}`
+              `合计：+ ${writeTotals.added}, ~ ${writeTotals.modified}, - ${writeTotals.removed}, → ${writeTotals.renamed}`
             );
-            console.log('specs 更新成功。');          }
+            console.log('Specs 更新成功。');
+          }
         }
       }
     }
@@ -495,7 +502,7 @@ export class ArchiveCommand {
       }
     }
     if (archiveExists) {
-      throw new ArchiveBlockedError('archive_target_exists', `Archive '${archiveName}' already exists.`);
+      throw new ArchiveBlockedError('archive_target_exists', `归档 '${archiveName}' 已存在。`);
     }
 
     // Create archive directory if needed
@@ -519,12 +526,7 @@ export class ArchiveCommand {
 
   private async selectChange(changesDir: string): Promise<string | null> {
     const { select } = await import('@inquirer/prompts');
-    // Get all directories in changes (excluding archive)
-    const entries = await fs.readdir(changesDir, { withFileTypes: true });
-    const changeDirs = entries
-      .filter(entry => entry.isDirectory() && entry.name !== 'archive')
-      .map(entry => entry.name)
-      .sort();
+    const changeDirs = await listActiveChangeNames(changesDir);
 
     if (changeDirs.length === 0) {
       console.log('未找到活跃的变更。');
@@ -536,7 +538,7 @@ export class ArchiveCommand {
     try {
       const progressList: Array<{ id: string; status: string }> = [];
       for (const id of changeDirs) {
-        const progress = await getTaskProgressForChange(changesDir, id);
+        const progress = await getTaskProgressForChange(changesDir, id, path.resolve(changesDir, '..', '..'));
         const status = formatTaskStatus(progress);
         progressList.push({ id, status });
       }

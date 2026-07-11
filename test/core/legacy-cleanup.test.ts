@@ -614,8 +614,8 @@ ${OPENSPEC_MARKERS.end}`);
 
       const summary = formatCleanupSummary(result);
       expect(summary).toContain('已清理旧版文件：');
-      expect(summary).toContain('✓ Removed CLAUDE.md');
-      expect(summary).toContain('✓ Removed CLINE.md');
+      expect(summary).toContain('✓ 已删除 CLAUDE.md');
+      expect(summary).toContain('✓ 已删除 CLINE.md');
     });
 
     it('should format deleted directories', () => {
@@ -628,7 +628,7 @@ ${OPENSPEC_MARKERS.end}`);
       };
 
       const summary = formatCleanupSummary(result);
-      expect(summary).toContain('✓ Removed .claude/commands/openspec/ (replaced by /opsx:*)');
+      expect(summary).toContain('✓ 已删除 .claude/commands/openspec/（由 /opsx:* 取代）');
     });
 
     it('should format modified files', () => {
@@ -641,7 +641,7 @@ ${OPENSPEC_MARKERS.end}`);
       };
 
       const summary = formatCleanupSummary(result);
-      expect(summary).toContain('✓ Removed OpenSpec markers from AGENTS.md');
+      expect(summary).toContain('✓ 已从 AGENTS.md 移除 OpenSpec 标记');
     });
 
     it('should include migration hint for project.md', () => {
@@ -811,7 +811,7 @@ ${OPENSPEC_MARKERS.end}`);
       const summary = formatDetectionSummary(detection);
       expect(summary).toContain('需要您注意');
       expect(summary).toContain('• openspec/project.md');
-      expect(summary).toContain('won\'t delete this file');
+      expect(summary).toContain('不会删除该文件');
       expect(summary).toContain('config.yaml');
       expect(summary).toContain('"context:"');
     });
@@ -882,21 +882,21 @@ ${OPENSPEC_MARKERS.end}`);
       const hint = formatProjectMdMigrationHint();
       expect(hint).toContain('需要您注意');
       expect(hint).toContain('openspec/project.md');
-      expect(hint).toContain('won\'t delete this file');
+      expect(hint).toContain('不会删除该文件');
       expect(hint).toContain('config.yaml');
       expect(hint).toContain('"context:"');
     });
 
     it('should include actionable instructions', () => {
       const hint = formatProjectMdMigrationHint();
-      expect(hint).toContain('move any useful content');
-      expect(hint).toContain('delete the file when ready');
+      expect(hint).toContain('将有用内容迁移到');
+      expect(hint).toContain('准备好后再删除该文件');
     });
 
     it('should explain the new context section benefits', () => {
       const hint = formatProjectMdMigrationHint();
-      expect(hint).toContain('included in every OpenSpec request');
-      expect(hint).toContain('reliably');
+      expect(hint).toContain('包含在每次 OpenSpec 请求中');
+      expect(hint).toContain('更可靠');
     });
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "@herbertgao/openspec-cn",
-  "version": "1.5.0",
+  "version": "1.6.0-beta.1",
   "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本（团队分支，含双语解析修复）",
   "keywords": [
     "openspec",
@@ -22,6 +22,7 @@
   "license": "MIT",
   "author": "OpenSpec Contributors",
   "type": "module",
+  "packageManager": "pnpm@9.15.9",
   "publishConfig": {
     "access": "public"
   },

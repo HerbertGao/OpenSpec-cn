@@ -15,6 +15,7 @@ describe('ArchiveCommand', () => {
   let tempDir: string;
   let archiveCommand: ArchiveCommand;
   const originalConsoleLog = console.log;
+  const originalExitCode = process.exitCode;
   const originalXdgDataHome = process.env.XDG_DATA_HOME;
 
   beforeEach(async () => {
@@ -38,12 +39,19 @@ describe('ArchiveCommand', () => {
     // Suppress console.log during tests
     console.log = vi.fn();
 
+    // Isolate process.exitCode so a failing run can't leak into the next
+    // test or skew the vitest process exit status.
+    process.exitCode = undefined;
+
     archiveCommand = new ArchiveCommand();
   });
 
   afterEach(async () => {
     // Restore console.log
     console.log = originalConsoleLog;
+
+    // Restore process.exitCode (clear anything a test set)
+    process.exitCode = originalExitCode;
 
     if (originalXdgDataHome === undefined) {
       delete process.env.XDG_DATA_HOME;
@@ -102,6 +110,50 @@ describe('ArchiveCommand', () => {
       // Verify warning was logged
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining('警告：发现 2 个未完成的任务')
+      );
+    });
+
+    it('detects incomplete tasks in nested glob tasks.md files (#1202 data-safety gate)', async () => {
+      // Before the fix the gate read a fixed changes/<name>/tasks.md, saw zero
+      // tasks for a glob-tasks change, and let an unfinished change archive.
+      const schemaDir = path.join(tempDir, 'openspec', 'schemas', 'glob-tasks');
+      await fs.mkdir(schemaDir, { recursive: true });
+      await fs.writeFile(
+        path.join(schemaDir, 'schema.yaml'),
+        [
+          'name: glob-tasks',
+          'version: 1',
+          'artifacts:',
+          '  - id: proposal',
+          '    generates: proposal.md',
+          '    description: Proposal',
+          '    template: proposal.md',
+          '    requires: []',
+          '  - id: tasks',
+          '    generates: "**/tasks.md"',
+          '    description: Nested tasks',
+          '    template: tasks.md',
+          '    requires: [proposal]',
+          'apply:',
+          '  requires: [tasks]',
+          '  tracks: "**/tasks.md"',
+          '',
+        ].join('\n')
+      );
+
+      const changeName = 'glob-incomplete-feature';
+      const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);
+      await fs.mkdir(path.join(changeDir, 'backend'), { recursive: true });
+      await fs.mkdir(path.join(changeDir, 'frontend'), { recursive: true });
+      await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: glob-tasks\n');
+      await fs.writeFile(path.join(changeDir, 'backend', 'tasks.md'), '- [x] 1.1 a\n- [x] 1.2 b\n');
+      await fs.writeFile(path.join(changeDir, 'frontend', 'tasks.md'), '- [x] 2.1 a\n- [ ] 2.2 b\n- [ ] 2.3 c\n');
+
+      await archiveCommand.execute(changeName, { yes: true, noValidate: true, skipSpecs: true });
+
+      // The gate now sees 5 tasks / 2 incomplete across the nested files.
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('2 个未完成的任务')
       );
     });
 
@@ -168,7 +220,7 @@ The system SHALL support logo and backgroundColor fields for gift cards.
       
       // Verify warning was logged about REMOVED requirements being ignored
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Warning: gift-card - 2 REMOVED requirement(s) ignored for new spec (nothing to remove).')
+        expect.stringContaining('警告：gift-card —— 已忽略 2 个 REMOVED 需求（新 spec 无内容可删除）。')
       );
       
       // Verify spec was created with only ADDED requirements
@@ -213,7 +265,7 @@ Modified content.`;
       
       // Verify error message mentions MODIFIED not allowed for new specs
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('new-capability: target spec does not exist; only ADDED requirements are allowed for new specs. MODIFIED and RENAMED operations require an existing spec.')
+        expect.stringContaining('new-capability: 目标 spec 不存在；新 spec 仅允许 ADDED 需求，MODIFIED 和 RENAMED 操作需要已存在的 spec。')
       );
       expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
       
@@ -251,7 +303,7 @@ New feature description.
       
       // Verify error message mentions RENAMED not allowed for new specs
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('another-capability: target spec does not exist; only ADDED requirements are allowed for new specs. MODIFIED and RENAMED operations require an existing spec.')
+        expect.stringContaining('another-capability: 目标 spec 不存在；新 spec 仅允许 ADDED 需求，MODIFIED 和 RENAMED 操作需要已存在的 spec。')
       );
       expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
       
@@ -284,7 +336,7 @@ New feature description.
       // Try to archive
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(`Archive '${date}-${changeName}' already exists.`);
+      ).rejects.toThrow(`归档 '${date}-${changeName}' 已存在。`);
     });
 
     it('should handle changes without tasks.md', async () => {
@@ -316,7 +368,7 @@ New feature description.
       
       // Should complete without spec updates
       expect(console.log).not.toHaveBeenCalledWith(
-        expect.stringContaining('要更新的 specs')
+        expect.stringContaining('待更新的 specs')
       );
       
       // Verify change was archived
@@ -340,7 +392,7 @@ New feature description.
       
       // Verify skip message was logged
       expect(console.log).toHaveBeenCalledWith(
-        '跳过 spec 更新（提供了 --skip-specs 标志）。'
+        '跳过 spec 更新（已提供 --skip-specs 标志）。'
       );
       
       // Verify spec was NOT copied to main specs
@@ -572,6 +624,180 @@ new text
       await expect(fs.access(changeDir)).resolves.not.toThrow();
     });
 
+    it('should abort stale MODIFIED blocks that would drop current scenarios (issue #1246)', async () => {
+      const mainSpecDir = path.join(tempDir, 'openspec', 'specs', 'stale-modified');
+      await fs.mkdir(mainSpecDir, { recursive: true });
+      const mainSpecPath = path.join(mainSpecDir, 'spec.md');
+      const baseSpec = `# stale-modified Specification
+
+## Purpose
+Stale modified purpose.
+
+## Requirements
+
+### Requirement: Shared Rule
+The system SHALL support the shared rule.
+
+#### Scenario: Existing behavior
+- **WHEN** the original behavior runs
+- **THEN** it succeeds`;
+      await fs.writeFile(mainSpecPath, baseSpec);
+
+      const changeA = 'modify-shared-a';
+      const changeADir = path.join(tempDir, 'openspec', 'changes', changeA);
+      const changeASpecDir = path.join(changeADir, 'specs', 'stale-modified');
+      await fs.mkdir(changeASpecDir, { recursive: true });
+      await fs.writeFile(path.join(changeASpecDir, 'spec.md'), `# Stale Modified - Change A
+
+## MODIFIED Requirements
+
+### Requirement: Shared Rule
+The system SHALL support the shared rule.
+
+#### Scenario: Existing behavior
+- **WHEN** the original behavior runs
+- **THEN** it succeeds
+
+#### Scenario: Behavior from A
+- **WHEN** change A behavior runs
+- **THEN** it succeeds`);
+
+      const changeB = 'modify-shared-b';
+      const changeBDir = path.join(tempDir, 'openspec', 'changes', changeB);
+      const changeBSpecDir = path.join(changeBDir, 'specs', 'stale-modified');
+      await fs.mkdir(changeBSpecDir, { recursive: true });
+      await fs.writeFile(path.join(changeBSpecDir, 'spec.md'), `# Stale Modified - Change B
+
+## MODIFIED Requirements
+
+### Requirement: Shared Rule
+The system SHALL support the shared rule.
+
+#### Scenario: Existing behavior
+- **WHEN** the original behavior runs
+- **THEN** it succeeds
+
+#### Scenario: Behavior from B
+- **WHEN** change B behavior runs
+- **THEN** it succeeds`);
+
+      await archiveCommand.execute(changeA, { yes: true, noValidate: true });
+      await archiveCommand.execute(changeB, { yes: true, noValidate: true });
+
+      const updated = await fs.readFile(mainSpecPath, 'utf-8');
+      expect(updated).toContain('#### Scenario: Existing behavior');
+      expect(updated).toContain('#### Scenario: Behavior from A');
+      expect(updated).not.toContain('#### Scenario: Behavior from B');
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'stale-modified MODIFIED failed for header "### Requirement: Shared Rule" - current spec contains scenario(s) not present in the modified block: "Behavior from A"'
+        )
+      );
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
+
+      await expect(fs.access(changeBDir)).resolves.not.toThrow();
+      const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
+      const archives = await fs.readdir(archiveDir);
+      expect(archives.some(a => a.includes(changeA))).toBe(true);
+      expect(archives.some(a => a.includes(changeB))).toBe(false);
+    });
+
+    it('aborts a MODIFIED that would drop a Chinese #### 场景 scenario (issue #1246, bilingual) [review C1]', async () => {
+      const mainSpecDir = path.join(tempDir, 'openspec', 'specs', 'zh-drift');
+      await fs.mkdir(mainSpecDir, { recursive: true });
+      const mainSpecPath = path.join(mainSpecDir, 'spec.md');
+      await fs.writeFile(mainSpecPath, `# zh-drift Specification
+
+## 目的
+中文场景漂移保护测试，验证 #### 场景 也受 #1246 保护。
+
+## 需求
+
+### 需求：共享规则
+系统必须支持共享规则。
+
+#### 场景：老场景
+- **当** 原有行为运行
+- **则** 成功
+
+#### 场景：保留场景
+- **当** 另一行为运行
+- **则** 成功`);
+
+      const changeName = 'zh-drift-change';
+      const changeSpecDir = path.join(tempDir, 'openspec', 'changes', changeName, 'specs', 'zh-drift');
+      await fs.mkdir(changeSpecDir, { recursive: true });
+      // MODIFIED keeps only 保留场景, dropping 老场景 — must abort, not silently delete.
+      await fs.writeFile(path.join(changeSpecDir, 'spec.md'), `# zh-drift Changes
+
+## 修改需求
+
+### 需求：共享规则
+系统必须支持共享规则。
+
+#### 场景：保留场景
+- **当** 另一行为运行
+- **则** 成功`);
+
+      await archiveCommand.execute(changeName, { yes: true, noValidate: true });
+
+      // Before the fix parseScenarioBlocks matched only ASCII "Scenario:", so the
+      // gate saw zero current scenarios and silently deleted 老场景.
+      const unchanged = await fs.readFile(mainSpecPath, 'utf-8');
+      expect(unchanged).toContain('老场景');
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('老场景'));
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
+    });
+
+    it('does NOT false-abort when a "dropped" #### 场景 only lived inside a fenced code block [review Codex#1]', async () => {
+      const mainSpecDir = path.join(tempDir, 'openspec', 'specs', 'fenced-scenario');
+      await fs.mkdir(mainSpecDir, { recursive: true });
+      await fs.writeFile(path.join(mainSpecDir, 'spec.md'), [
+        '# fenced-scenario Specification',
+        '',
+        '## 目的',
+        '围栏代码块内的示例场景不应被 #1246 漂移保护计为真实场景。',
+        '',
+        '## 需求',
+        '',
+        '### 需求：规则',
+        '系统必须支持该规则。',
+        '',
+        '#### 场景：真实场景',
+        '- **当** 行为运行',
+        '- **则** 成功',
+        '',
+        '```markdown',
+        '#### 场景：文档示例',
+        '仅为文档，并非真实场景',
+        '```',
+      ].join('\n'));
+
+      const changeName = 'fenced-modify';
+      const changeSpecDir = path.join(tempDir, 'openspec', 'changes', changeName, 'specs', 'fenced-scenario');
+      await fs.mkdir(changeSpecDir, { recursive: true });
+      // MODIFIED keeps the one REAL scenario; the fenced example is not a scenario,
+      // so there is no drift and archive must succeed (pre-fix it false-aborted).
+      await fs.writeFile(path.join(changeSpecDir, 'spec.md'), [
+        '# fenced Changes',
+        '',
+        '## 修改需求',
+        '',
+        '### 需求：规则',
+        '系统必须支持该规则。',
+        '',
+        '#### 场景：真实场景',
+        '- **当** 行为运行',
+        '- **则** 成功',
+      ].join('\n'));
+
+      await archiveCommand.execute(changeName, { yes: true, noValidate: true });
+
+      expect(console.log).not.toHaveBeenCalledWith('已中止。未更改任何文件。');
+      const archived = await fs.readdir(path.join(tempDir, 'openspec', 'changes', 'archive'));
+      expect(archived.some(a => a.includes(changeName))).toBe(true);
+    });
+
     it('should abort with a structural error when target spec hides requirements outside ## Requirements', async () => {
       const changeName = 'hidden-requirement-target';
       const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);
@@ -619,7 +845,7 @@ The system SHALL do B differently.
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
 
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('delta-target: target spec is structurally invalid and cannot be updated until fixed:')
+        expect.stringContaining('delta-target: 目标 spec 结构无效，修复前无法更新：')
       );
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining('需求标题 "### Requirement: B" 出现在主 ## Requirements 章节之外。')
@@ -671,7 +897,7 @@ new body`;
       expect(unchanged).toBe(mainContent);
       // Assert error message format and abort notice
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('delta validation failed')
+        expect.stringContaining('delta 验证失败')
       );
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining('已中止。未更改任何文件。')
@@ -777,19 +1003,184 @@ E1 updated`);
 
       // Verify aggregated totals line was printed
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('总计：+ 1, ~ 1, - 0, → 1')
+        expect.stringContaining('合计：+ 1, ~ 1, - 0, → 1')
       );
     });
   });
 
+  describe('exit code on blocked archive (human mode)', () => {
+    // Regression for the silent-exit-0 bug: when archive is blocked in
+    // human mode it must set a non-zero exit code so scripts/CI can detect
+    // the failure, mirroring the JSON-mode behavior.
+    it('sets exit code 1 when delta spec validation fails', async () => {
+      const changeName = 'exit-delta-fail';
+      const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);
+      const changeSpecDir = path.join(changeDir, 'specs', 'bad-capability');
+      await fs.mkdir(changeSpecDir, { recursive: true });
+
+      // Delta spec missing required SHALL/MUST keyword -> validation error
+      const specContent = `# Bad Capability - Changes
+
+## ADDED Requirements
+
+### Requirement: Logging Feature
+
+The system will log all events.
+
+#### Scenario: Event recorded
+- **WHEN** an event occurs
+- **THEN** it is captured`;
+      await fs.writeFile(path.join(changeSpecDir, 'spec.md'), specContent);
+      await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [x] Task 1\n');
+
+      await archiveCommand.execute(changeName, { yes: true, skipSpecs: true });
+
+      expect(process.exitCode).toBe(1);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('验证失败')
+      );
+
+      // Change must NOT have been archived
+      const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
+      const archives = await fs.readdir(archiveDir);
+      expect(archives.some(a => a.includes(changeName))).toBe(false);
+    });
+
+    it('sets exit code 1 when spec rebuild fails (MODIFIED on new spec)', async () => {
+      const changeName = 'exit-rebuild-fail';
+      const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);
+      const changeSpecDir = path.join(changeDir, 'specs', 'new-capability');
+      await fs.mkdir(changeSpecDir, { recursive: true });
+
+      // MODIFIED on a non-existent target spec aborts the rebuild
+      const specContent = `# New Capability - Changes
+
+## ADDED Requirements
+
+### Requirement: New Feature
+New feature description.
+
+## MODIFIED Requirements
+
+### Requirement: Existing Feature
+Modified content.`;
+      await fs.writeFile(path.join(changeSpecDir, 'spec.md'), specContent);
+
+      await archiveCommand.execute(changeName, { yes: true, noValidate: true });
+
+      expect(process.exitCode).toBe(1);
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
+
+      const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'new-capability', 'spec.md');
+      await expect(fs.access(mainSpecPath)).rejects.toThrow();
+
+      const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
+      const archives = await fs.readdir(archiveDir);
+      expect(archives.some(a => a.includes(changeName))).toBe(false);
+    });
+
+    it('sets exit code 1 when rebuilt spec fails validateSpecContent', async () => {
+      // Spot 3 is defensive: spot 1 (validateChangeDeltaSpecs) already
+      // enforces SHALL/MUST/scenario rules on the delta, and buildUpdatedSpec
+      // pre-validates target structure, so a real delta almost never reaches
+      // this branch. Spy on validateSpecContent (the existing --no-validate
+      // test uses the same spy pattern) to force the rebuilt spec invalid
+      // while buildUpdatedSpec runs for real — exercising the exit-code fix.
+      const changeName = 'exit-rebuilt-validate-fail';
+      const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);
+      const changeSpecDir = path.join(changeDir, 'specs', 'rebuilt-capability');
+      await fs.mkdir(changeSpecDir, { recursive: true });
+
+      // Existing main spec so MODIFIED targets a real spec and buildUpdatedSpec
+      // succeeds (does not throw).
+      const mainSpecDir = path.join(tempDir, 'openspec', 'specs', 'rebuilt-capability');
+      await fs.mkdir(mainSpecDir, { recursive: true });
+      const mainContent = `# rebuilt-capability Specification
+
+## Purpose
+Rebuilt capability purpose.
+
+## Requirements
+
+### Requirement: Existing Feature
+The system SHALL do the thing.
+
+#### Scenario: works
+- **WHEN** x
+- **THEN** y`;
+      await fs.writeFile(path.join(mainSpecDir, 'spec.md'), mainContent);
+
+      // Valid MODIFIED delta (passes spot 1 delta validation).
+      const deltaContent = `# Rebuilt Capability - Changes
+
+## MODIFIED Requirements
+
+### Requirement: Existing Feature
+The system SHALL do the thing differently.
+
+#### Scenario: works
+- **WHEN** x
+- **THEN** z`;
+      await fs.writeFile(path.join(changeSpecDir, 'spec.md'), deltaContent);
+      await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [x] Task 1\n');
+
+      const specContentSpy = vi
+        .spyOn(Validator.prototype, 'validateSpecContent')
+        .mockResolvedValue({
+          valid: false,
+          issues: [
+            { level: 'ERROR', path: 'requirements[0]', message: 'mocked rebuilt-spec failure' },
+          ],
+          summary: { errors: 1, warnings: 0, info: 0 },
+        });
+
+      try {
+        await archiveCommand.execute(changeName, { yes: true });
+
+        expect(process.exitCode).toBe(1);
+        // buildUpdatedSpec ran for real and the spy made its output "invalid"
+        expect(specContentSpy).toHaveBeenCalled();
+        expect(console.log).toHaveBeenCalledWith(
+          expect.stringContaining('为 rebuilt-capability 重建的 spec 存在验证错误')
+        );
+        expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
+
+        // Main spec must be unchanged (no writes happened)
+        const still = await fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8');
+        expect(still).toBe(mainContent);
+
+        // Change must NOT have been archived
+        const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
+        const archives = await fs.readdir(archiveDir);
+        expect(archives.some(a => a.includes(changeName))).toBe(false);
+      } finally {
+        specContentSpy.mockRestore();
+      }
+    });
+
+    it('leaves exit code 0 on successful archive (no leak from prior test)', async () => {
+      const changeName = 'exit-ok';
+      const changeDir = path.join(tempDir, 'openspec', 'changes', changeName);
+      await fs.mkdir(changeDir, { recursive: true });
+
+      await archiveCommand.execute(changeName, { yes: true });
+
+      expect(process.exitCode).toBeUndefined();
+
+      const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
+      const archives = await fs.readdir(archiveDir);
+      expect(archives.some(a => a.includes(changeName))).toBe(true);
+    });
+  });
+
   describe('error handling', () => {
-    it('should throw error when openspec directory does not exist', async () => {
+    it('should report no active changes when openspec directory does not exist', async () => {
       // Remove openspec directory
       await fs.rm(path.join(tempDir, 'openspec'), { recursive: true });
       
       await expect(
         archiveCommand.execute('any-change', { yes: true })
-      ).rejects.toThrow("未找到 OpenSpec changes 目录。请先运行 'openspec-cn init'。");
+      ).rejects.toThrow("未找到变更 'any-change'。此根目录下不存在活跃的变更。");
     });
   });
 

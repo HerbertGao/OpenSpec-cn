@@ -1,7 +1,14 @@
-const REQUIREMENTS_SECTION_HEADER = /^##\s+Requirements\s*$/i;
+// Bilingual detection: this main-spec structure guard must understand the same
+// English + Chinese markers the rest of the parser accepts (issue #31), or it
+// (a) false-flags a `## 需求` section with an English `### Requirement:` header
+// and (b) silently drops a misplaced Chinese `### 需求：` requirement (the #498
+// truncation-safety diagnostic never fires for Chinese authors).
+// ponytail: the `(?:Requirement|需求)[:：]` shape is also declared in
+// requirement-blocks.ts; a future cleanup could export one shared constant.
+const REQUIREMENTS_SECTION_HEADER = /^##\s+(?:Requirements|需求)\s*$/i;
 const TOP_LEVEL_SECTION_HEADER = /^##\s+/;
-const DELTA_HEADER = /^##\s+(ADDED|MODIFIED|REMOVED|RENAMED)\s+Requirements\s*$/i;
-const REQUIREMENT_HEADER = /^###\s+Requirement:\s*(.+)\s*$/i;
+const DELTA_HEADER = /^##\s+(?:(?:ADDED|MODIFIED|REMOVED|RENAMED)\s+Requirements|(?:新增|修改|移除|重命名)需求)\s*$/i;
+const REQUIREMENT_HEADER = /^###\s*(?:Requirement|需求)[:：]\s*(.+)\s*$/i;
 
 export interface MainSpecStructureIssue {
   kind: 'delta-header' | 'requirement-outside-requirements';

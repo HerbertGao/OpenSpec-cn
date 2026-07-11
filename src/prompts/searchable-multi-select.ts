@@ -147,17 +147,17 @@ async function createSearchableMultiSelect(): Promise<
 
     // Search box
     lines.push(
-      `  Search: ${chalk.yellow('[')}${searchText || chalk.dim('type to filter')}${chalk.yellow(']')}`
+      `  搜索：${chalk.yellow('[')}${searchText || chalk.dim('输入以筛选')}${chalk.yellow(']')}`
     );
 
     // Instructions
     lines.push(
-      `  ${chalk.cyan('↑↓')} navigate • ${chalk.cyan('Space')} toggle • ${chalk.cyan('Backspace')} remove • ${chalk.cyan('Enter')} confirm`
+      `  ${chalk.cyan('↑↓')} 导航 • ${chalk.cyan('Space')} 切换 • ${chalk.cyan('Backspace')} 移除 • ${chalk.cyan('Enter')} 确认`
     );
 
     // List
     if (filteredChoices.length === 0) {
-      lines.push(chalk.yellow('  No matches'));
+      lines.push(chalk.yellow('  无匹配项'));
     } else {
       // Calculate pagination
       const startIndex = Math.max(

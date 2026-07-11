@@ -15,6 +15,7 @@ import {
   type RequirementBlock,
 } from './parsers/requirement-blocks.js';
 import { findMainSpecStructureIssues } from './parsers/spec-structure.js';
+import { buildCodeFenceMask } from './parsers/requirement-text.js';
 import { Validator } from './validation/validator.js';
 
 // -----------------------------------------------------------------------------
@@ -45,6 +46,11 @@ export interface SpecsApplyOutput {
     renamed: number;
   };
   noChanges: boolean;
+}
+
+interface ScenarioBlock {
+  name: string;
+  raw: string;
 }
 
 // -----------------------------------------------------------------------------
@@ -117,7 +123,7 @@ export async function buildUpdatedSpec(
     const name = normalizeRequirementName(add.name);
     if (addedNames.has(name)) {
       throw new Error(
-        `${specName} validation failed - duplicate requirement in ADDED for header "### Requirement: ${add.name}"`
+        `${specName} 验证失败 —— ADDED 中存在重复需求，标题 "### Requirement: ${add.name}"`
       );
     }
     addedNames.add(name);
@@ -127,7 +133,7 @@ export async function buildUpdatedSpec(
     const name = normalizeRequirementName(mod.name);
     if (modifiedNames.has(name)) {
       throw new Error(
-        `${specName} validation failed - duplicate requirement in MODIFIED for header "### Requirement: ${mod.name}"`
+        `${specName} 验证失败 —— MODIFIED 中存在重复需求，标题 "### Requirement: ${mod.name}"`
       );
     }
     modifiedNames.add(name);
@@ -137,7 +143,7 @@ export async function buildUpdatedSpec(
     const name = normalizeRequirementName(rem);
     if (removedNamesSet.has(name)) {
       throw new Error(
-        `${specName} validation failed - duplicate requirement in REMOVED for header "### Requirement: ${rem}"`
+        `${specName} 验证失败 —— REMOVED 中存在重复需求，标题 "### Requirement: ${rem}"`
       );
     }
     removedNamesSet.add(name);
@@ -149,12 +155,12 @@ export async function buildUpdatedSpec(
     const toNorm = normalizeRequirementName(to);
     if (renamedFromSet.has(fromNorm)) {
       throw new Error(
-        `${specName} validation failed - duplicate FROM in RENAMED for header "### Requirement: ${from}"`
+        `${specName} 验证失败 —— RENAMED 中 FROM 存在重复，标题 "### Requirement: ${from}"`
       );
     }
     if (renamedToSet.has(toNorm)) {
       throw new Error(
-        `${specName} validation failed - duplicate TO in RENAMED for header "### Requirement: ${to}"`
+        `${specName} 验证失败 —— RENAMED 中 TO 存在重复，标题 "### Requirement: ${to}"`
       );
     }
     renamedFromSet.add(fromNorm);
@@ -176,20 +182,20 @@ export async function buildUpdatedSpec(
     const toNorm = normalizeRequirementName(to);
     if (modifiedNames.has(fromNorm)) {
       throw new Error(
-        `${specName} validation failed - when a rename exists, MODIFIED must reference the NEW header "### Requirement: ${to}"`
+        `${specName} 验证失败 —— 存在重命名时，MODIFIED 必须引用新标题 "### Requirement: ${to}"`
       );
     }
     // Detect ADDED colliding with a RENAMED TO
     if (addedNames.has(toNorm)) {
       throw new Error(
-        `${specName} validation failed - RENAMED TO header collides with ADDED for "### Requirement: ${to}"`
+        `${specName} 验证失败 —— RENAMED 的 TO 标题与 ADDED 冲突 "### Requirement: ${to}"`
       );
     }
   }
   if (conflicts.length > 0) {
     const c = conflicts[0];
     throw new Error(
-      `${specName} validation failed - requirement present in multiple sections (${c.a} and ${c.b}) for header "### Requirement: ${c.name}"`
+      `${specName} 验证失败 —— 需求同时出现在多个部分（${c.a} 和 ${c.b}），标题 "### Requirement: ${c.name}"`
     );
   }
   const hasAnyDelta = plan.added.length + plan.modified.length + plan.removed.length + plan.renamed.length > 0;
@@ -210,14 +216,14 @@ export async function buildUpdatedSpec(
     // REMOVED will be ignored with a warning since there's nothing to remove
     if (plan.modified.length > 0 || plan.renamed.length > 0) {
       throw new Error(
-        `${specName}: target spec does not exist; only ADDED requirements are allowed for new specs. MODIFIED and RENAMED operations require an existing spec.`
+        `${specName}: 目标 spec 不存在；新 spec 仅允许 ADDED 需求，MODIFIED 和 RENAMED 操作需要已存在的 spec。`
       );
     }
     // Warn about REMOVED requirements being ignored for new specs
     if (plan.removed.length > 0 && !options.silent) {
       console.log(
         chalk.yellow(
-          `⚠️  Warning: ${specName} - ${plan.removed.length} REMOVED requirement(s) ignored for new spec (nothing to remove).`
+          `⚠️  警告：${specName} —— 已忽略 ${plan.removed.length} 个 REMOVED 需求（新 spec 无内容可删除）。`
         )
       );
     }
@@ -231,7 +237,7 @@ export async function buildUpdatedSpec(
       .map(issue => `line ${issue.line}: ${issue.message}`)
       .join('\n');
     throw new Error(
-      `${specName}: target spec is structurally invalid and cannot be updated until fixed:\n${details}`
+      `${specName}: 目标 spec 结构无效，修复前无法更新：\n${details}`
     );
   }
 
@@ -248,10 +254,10 @@ export async function buildUpdatedSpec(
     const from = normalizeRequirementName(r.from);
     const to = normalizeRequirementName(r.to);
     if (!nameToBlock.has(from)) {
-      throw new Error(`${specName} RENAMED failed for header "### Requirement: ${r.from}" - source not found`);
+      throw new Error(`${specName} RENAMED 失败，标题 "### Requirement: ${r.from}" —— 未找到源需求`);
     }
     if (nameToBlock.has(to)) {
-      throw new Error(`${specName} RENAMED failed for header "### Requirement: ${r.to}" - target already exists`);
+      throw new Error(`${specName} RENAMED 失败，标题 "### Requirement: ${r.to}" —— 目标已存在`);
     }
     const block = nameToBlock.get(from)!;
     const newHeader = `### Requirement: ${to}`;
@@ -273,7 +279,7 @@ export async function buildUpdatedSpec(
       // For new specs, REMOVED requirements are already warned about and ignored
       // For existing specs, missing requirements are an error
       if (!isNewSpec) {
-        throw new Error(`${specName} REMOVED failed for header "### Requirement: ${name}" - not found`);
+        throw new Error(`${specName} REMOVED 失败，标题 "### Requirement: ${name}" —— 未找到`);
       }
       // Skip removal for new specs (already warned above)
       continue;
@@ -284,14 +290,21 @@ export async function buildUpdatedSpec(
   // MODIFIED
   for (const mod of plan.modified) {
     const key = normalizeRequirementName(mod.name);
-    if (!nameToBlock.has(key)) {
-      throw new Error(`${specName} MODIFIED failed for header "### Requirement: ${mod.name}" - not found`);
+    const currentBlock = nameToBlock.get(key);
+    if (!currentBlock) {
+      throw new Error(`${specName} MODIFIED 失败，标题 "### Requirement: ${mod.name}" —— 未找到`);
     }
     // Replace block with provided raw (ensure header line matches key)
     const modHeaderMatch = mod.raw.split('\n')[0].match(/^###\s*(?:Requirement|需求)[:：]\s*(.+)\s*$/i);
     if (!modHeaderMatch || normalizeRequirementName(modHeaderMatch[1]) !== key) {
       throw new Error(
-        `${specName} MODIFIED failed for header "### Requirement: ${mod.name}" - header mismatch in content`
+        `${specName} MODIFIED 失败，标题 "### Requirement: ${mod.name}" —— 内容中的标题不匹配`
+      );
+    }
+    const missingScenarios = findMissingCurrentScenarios(currentBlock, mod);
+    if (missingScenarios.length > 0) {
+      throw new Error(
+        `${specName} MODIFIED failed for header "### Requirement: ${mod.name}" - current spec contains scenario(s) not present in the modified block: ${missingScenarios.map(name => `"${name}"`).join(', ')}. Refresh the change spec before archiving to avoid dropping scenarios.`
       );
     }
     nameToBlock.set(key, mod);
@@ -301,7 +314,7 @@ export async function buildUpdatedSpec(
   for (const add of plan.added) {
     const key = normalizeRequirementName(add.name);
     if (nameToBlock.has(key)) {
-      throw new Error(`${specName} ADDED failed for header "### Requirement: ${add.name}" - already exists`);
+      throw new Error(`${specName} ADDED 失败，标题 "### Requirement: ${add.name}" —— 已存在`);
     }
     nameToBlock.set(key, add);
   }
@@ -378,6 +391,49 @@ export async function writeUpdatedSpec(
 export function buildSpecSkeleton(specFolderName: string, changeName: string): string {
   const titleBase = specFolderName;
   return `# ${titleBase} Specification\n\n## Purpose\nTBD - created by archiving change ${changeName}. Update Purpose after archive.\n\n## Requirements\n`;
+}
+
+function findMissingCurrentScenarios(current: RequirementBlock, incoming: RequirementBlock): string[] {
+  const incomingScenarioNames = new Set(parseScenarioBlocks(incoming.raw).map((scenario) => scenario.name));
+  return parseScenarioBlocks(current.raw)
+    .filter((scenario) => !incomingScenarioNames.has(scenario.name))
+    .map((scenario) => scenario.name);
+}
+
+// Bilingual (English + Chinese, ASCII + full-width colon). `(\S.*?)` requires a
+// real name — a nameless / whitespace-only `#### 场景：` is not a scenario.
+const SCENARIO_HEADER_RE = /^####\s*(?:Scenario|场景)[:：]\s*(\S.*?)\s*$/;
+
+function parseScenarioBlocks(requirementRaw: string): ScenarioBlock[] {
+  const lines = requirementRaw.replace(/\r\n?/g, '\n').split('\n');
+  // Fence-aware: a `#### Scenario:` / `#### 场景：` inside a fenced code block is
+  // a documentation example, not a real scenario — masking it keeps the #1246
+  // drift gate from false-aborting on a fenced example.
+  const fenceMask = buildCodeFenceMask(lines);
+  const isScenarioHeader = (i: number): boolean => !fenceMask[i] && SCENARIO_HEADER_RE.test(lines[i]);
+  const scenarios: ScenarioBlock[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    if (!isScenarioHeader(index)) {
+      index++;
+      continue;
+    }
+
+    const start = index;
+    const name = lines[index].match(SCENARIO_HEADER_RE)![1].trim();
+    index++;
+    while (index < lines.length && !isScenarioHeader(index)) {
+      index++;
+    }
+
+    scenarios.push({
+      name,
+      raw: lines.slice(start, index).join('\n').trimEnd(),
+    });
+  }
+
+  return scenarios;
 }
 
 /**
