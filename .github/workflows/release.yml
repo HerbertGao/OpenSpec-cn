@@ -50,5 +50,13 @@ jobs:
       # Publish with npm (not pnpm): pnpm's OIDC support is unreliable.
       # No NODE_AUTH_TOKEN — auth is via GitHub OIDC + the configured
       # Trusted Publisher. Provenance attestations are attached automatically.
+      #
+      # dist-tag: prerelease versions (1.6.0-beta.1) publish under `beta` so
+      # they never become `latest`; stable versions publish under `latest`.
+      # ponytail: any prerelease → `beta`; if an `rc`/`alpha` line ever ships,
+      # parse the identifier out of the version instead.
       - name: Publish to npm (OIDC trusted publishing)
-        run: npm publish --access public
+        run: |
+          TAG=$(node -p "require('./package.json').version.includes('-') ? 'beta' : 'latest'")
+          echo "Publishing @herbertgao/openspec-cn under dist-tag: $TAG"
+          npm publish --access public --tag "$TAG"
