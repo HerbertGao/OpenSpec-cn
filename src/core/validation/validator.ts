@@ -521,9 +521,9 @@ export class Validator {
    * the author at that exact fix when the keyword is found in the header only.
    */
   private buildMissingShallOrMustMessage(prefix: string, blockName: string): string {
-    const base = `${prefix} must contain SHALL or MUST`;
+    const base = `${prefix} 必须包含 SHALL 或 MUST`;
     if (this.containsShallOrMust(blockName)) {
-      return `${base} in the requirement body, not only in the header. Move the SHALL/MUST statement to the line immediately after the "### Requirement: ..." header.`;
+      return `${base}（在需求正文中，而非仅在标题中）。请将 SHALL/MUST 语句移到 "### Requirement: ..." 标题后的下一行。`;
     }
     return base;
   }

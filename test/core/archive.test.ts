@@ -752,7 +752,7 @@ The system SHALL do B differently.
         expect.stringContaining('delta-target: target spec is structurally invalid and cannot be updated until fixed:')
       );
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Requirement header "### Requirement: B" appears outside the main ## Requirements section.')
+        expect.stringContaining('需求标题 "### Requirement: B" 出现在主 ## Requirements 章节之外。')
       );
       expect(console.log).toHaveBeenCalledWith('Aborted. No files were changed.');
 

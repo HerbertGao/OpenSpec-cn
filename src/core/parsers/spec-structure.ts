@@ -41,9 +41,9 @@ export function findMainSpecStructureIssues(content: string): MainSpecStructureI
         line: i + 1,
         header: trimmed,
         message:
-          `Main spec contains delta header "${trimmed}". ` +
-          'Delta headers are only valid inside openspec/changes/<name>/specs/<capability>/spec.md ' +
-          'and truncate the parsed ## Requirements section.',
+          `主 spec 包含 delta 标题 "${trimmed}"。` +
+          'Delta 标题仅在 openspec/changes/<name>/specs/<capability>/spec.md 内有效，' +
+          '并会截断已解析的 ## Requirements 章节。',
       });
       continue;
     }
@@ -64,8 +64,8 @@ export function findMainSpecStructureIssues(content: string): MainSpecStructureI
         line: i + 1,
         header: trimmed,
         message:
-          `Requirement header "${trimmed}" appears outside the main ## Requirements section. ` +
-          'Main specs only parse requirements inside that section, so this requirement is currently invisible to validate, list, and archive.',
+          `需求标题 "${trimmed}" 出现在主 ## Requirements 章节之外。` +
+          '主 spec 仅解析该章节内的需求，因此该需求目前对 validate、list 和 archive 不可见。',
       });
     }
   }
