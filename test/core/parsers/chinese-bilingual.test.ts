@@ -5,7 +5,7 @@ import os from 'os';
 import { MarkdownParser } from '../../../src/core/parsers/markdown-parser.js';
 import { ChangeParser } from '../../../src/core/parsers/change-parser.js';
 import { extractRequirementsSection, parseDeltaSpec } from '../../../src/core/parsers/requirement-blocks.js';
-import { RequirementSchema } from '../../../src/core/schemas/index.js';
+import { findMainSpecStructureIssues } from '../../../src/core/parsers/spec-structure.js';
 import { Validator } from '../../../src/core/validation/validator.js';
 
 /**
@@ -190,23 +190,33 @@ The system SHALL authenticate.
     });
   });
 
-  describe('RequirementSchema', () => {
-    it('accepts Chinese requirement keywords 必须 / 禁止', () => {
-      for (const text of ['系统必须记录日志。', '系统禁止明文存储密码。']) {
-        const result = RequirementSchema.safeParse({
-          text,
-          scenarios: [{ rawText: 'Given / When / Then' }],
-        });
-        expect(result.success).toBe(true);
-      }
+  // Keyword recognition moved out of the zod schema into the Validator (upstream
+  // #1156): a RequirementSchema.safeParse passes for ANY non-empty text and would
+  // prove nothing about 必须/禁止 recognition, so pin it through the Validator.
+  describe('Validator bilingual requirement-keyword recognition', () => {
+    const zhSpec = (body: string) => `# 用户认证规范
+
+## 目的
+本规范定义系统用户认证与登录相关的功能需求，涵盖凭证校验、会话管理以及登录失败处理等方面的行为约束。
+
+## 需求
+
+### 需求: 安全登录
+${body}
+
+#### 场景: 成功登录
+- **当** 用户提供有效凭证
+- **则** 用户通过认证`;
+
+    it('accepts a requirement whose body uses 必须', async () => {
+      const report = await new Validator(true).validateSpecContent('auth', zhSpec('系统必须提供安全的用户登录能力。'));
+      expect(report.valid).toBe(true);
     });
 
-    it('still accepts English SHALL / MUST', () => {
-      const result = RequirementSchema.safeParse({
-        text: 'The system SHALL log events.',
-        scenarios: [{ rawText: 'Given / When / Then' }],
-      });
-      expect(result.success).toBe(true);
+    it('flags a requirement whose body has no SHALL/MUST/必须/禁止', async () => {
+      const report = await new Validator(true).validateSpecContent('auth', zhSpec('系统提供安全的用户登录能力。'));
+      expect(report.valid).toBe(false);
+      expect(report.issues.some(i => i.level === 'ERROR' && i.message.includes('SHALL'))).toBe(true);
     });
   });
 
@@ -261,6 +271,27 @@ The system SHALL authenticate.
       const report = await new Validator(true).validateChangeDeltaSpecs(changeDir);
       expect(report.valid).toBe(true);
       expect(report.summary.errors).toBe(0);
+    });
+  });
+
+  // Regression for review finding F1: findMainSpecStructureIssues (feeds
+  // validate <spec> and archive/specs-apply, which THROWS) must understand
+  // Chinese markers, or it false-flags a `## 需求` section and silently drops a
+  // misplaced Chinese `### 需求：` requirement (the #498 diagnostic never fires).
+  describe('findMainSpecStructureIssues bilingual (issue #31)', () => {
+    it('does NOT false-flag an English requirement header inside a Chinese ## 需求 section', () => {
+      const issues = findMainSpecStructureIssues('## 需求\n\n### Requirement: Foo\nThe system SHALL foo.\n');
+      expect(issues.some(i => i.kind === 'requirement-outside-requirements')).toBe(false);
+    });
+
+    it('flags a Chinese ### 需求： requirement placed outside the requirements section', () => {
+      const issues = findMainSpecStructureIssues('## 目的\n概述。\n\n### 需求：隐藏需求\n系统必须做某事。\n');
+      expect(issues.some(i => i.kind === 'requirement-outside-requirements')).toBe(true);
+    });
+
+    it('flags a Chinese delta header (## 新增需求) in a main spec', () => {
+      const issues = findMainSpecStructureIssues('## 需求\n\n### 需求：X\n系统必须做某事。\n\n## 新增需求\n\n### 需求：Y\n');
+      expect(issues.some(i => i.kind === 'delta-header')).toBe(true);
     });
   });
 });

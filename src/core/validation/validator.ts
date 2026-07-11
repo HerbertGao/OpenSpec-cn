@@ -148,7 +148,7 @@ export class Validator {
         // archive/validate <spec>. The list comes from the parse itself, so it
         // reflects exactly what the reader skipped.
         for (const stray of plan.skippedHeaders) {
-          const nameless = /^requirement:?$/i.test(stray.header);
+          const nameless = /^(?:requirement|需求)[:：]?$/i.test(stray.header);
           issues.push({
             level: 'INFO',
             path: entryPath,
