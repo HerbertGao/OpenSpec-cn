@@ -1,5 +1,8 @@
 # OpenSpec 文档
 
+> [!WARNING]
+> 这些页面是遗留文档，部分内容已过时。当前文档见 **[openspec.dev/docs](https://openspec.dev/docs)**（源码：[`docs-lab/`](../docs-lab/)）。
+
 欢迎。这里汇集了关于 OpenSpec 的一切。
 
 OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要构建什么”达成一致。** 你描述这次变更,AI 起草一份简短的 spec 和任务清单,你们双方看着同一份计划,然后才开始动手。再也不会做到一半才发现 AI 把东西做错了。

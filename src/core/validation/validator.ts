@@ -18,6 +18,7 @@ import {
   extractRequirementsSection,
   diffScenarioNames,
   describeScenarioBalance,
+  describeUnappliedContent,
   type RequirementBlock,
 } from '../parsers/requirement-blocks.js';
 import {
@@ -254,6 +255,17 @@ export class Validator {
             path: entryPath,
             line: orphan.line,
             message: `需求 "${orphan.name}" ${where}，这不是 delta 章节，因此会被忽略。请将其移到 "## ADDED Requirements"、"## MODIFIED Requirements"、"## REMOVED Requirements" 或 "## RENAMED Requirements" 之下。`,
+          });
+        }
+
+        // Archive carries requirement blocks only, by design. Warn so text
+        // written elsewhere is moved rather than lost without notice.
+        for (const lost of plan.unappliedContent) {
+          issues.push({
+            level: 'WARNING',
+            path: entryPath,
+            line: lost.line,
+            message: `${describeUnappliedContent(lost, true)} is not carried into the main spec by archive. Move it into a requirement, or into proposal.md or design.md.`,
           });
         }
 

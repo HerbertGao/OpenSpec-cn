@@ -41,11 +41,6 @@
 → 从个人项目到企业规模都可扩展
 ```
 
-> [!TIP]
-> **全新工作流现已上线！** 我们用一种全新的"以制品（artifact）为导向"的工作流重构了 OpenSpec。
->
-> 运行 `/opsx:propose "你的想法"` 开始使用。→ [在此了解更多](docs/opsx.md)
-
 <p align="center">
   关注 <a href="https://x.com/0xTab">X 上的 @0xTab</a> 获取更新 · 加入 <a href="https://discord.gg/YctCnvvshC">OpenSpec Discord</a> 获取帮助与答疑。
 </p>
@@ -120,13 +115,13 @@ OpenSpec is built with OpenSpec — browse this repo's live [specs](openspec/spe
 
 单人开发时，OpenSpec 让你和你的 AI 在同一个仓库里保持诚实。在团队中，难点转移了：一个功能横跨 API 服务、Web 应用和一个共享库；需求由一个团队拥有，却被其他团队消费；规划在你写任何代码之前就已经开始。
 
-**[Stores](docs/stores-beta/user-guide.md)** 就是答案 —— 把规划放到一个独立的仓库里。你熟悉的 `openspec/` 形态（specs 和 changes）原样保留，通过 `git push` 像其他东西一样共享。整个团队和每个编码代理都能跨仓库读取的单一事实来源。
+**[Stores](https://openspec.dev/docs/stores)** 就是答案 —— 把规划放到一个独立的仓库里。你熟悉的 `openspec/` 形态（specs 和 changes）原样保留，通过 `git push` 像其他东西一样共享。整个团队和每个编码代理都能跨仓库读取的单一事实来源。
 
 - **跨仓库功能** —— 一个变更、一个计划，即使代码落在三个仓库里。
 - **共享需求** —— 平台团队拥有 specs；产品团队以只读方式引用它们，就在编码代理能读到的地方。不再有漂移的 wiki。
 - **先规划后编码** —— 现在把计划捕获到 store 中；代码仓库随后跟上。
 
-> Stores 目前处于 **beta** 阶段。请从 [Stores 用户指南](docs/stores-beta/user-guide.md) 开始。
+> Stores 目前处于 **beta** 阶段。请从 [Stores 指南](https://openspec.dev/docs/stores) 开始。
 
 ## 快速开始
 
@@ -151,43 +146,33 @@ cd your-project
 openspec-cn init
 ```
 
-> **Want your AI to do it?** Paste the [setup prompt](docs-lab/start/installation.md#install-with-your-ai-assistant) into your coding assistant — it installs the CLI, runs `openspec init`, and verifies the result.
+> **想让你的 AI 来完成？** 把[安装提示词](https://openspec.dev/docs/installation#install-with-your-ai-assistant)粘贴给你的编程助手 —— 它会安装 CLI、运行 `openspec init` 并验证结果。
 
-Now talk to your AI:
+现在与你的 AI 对话：
 
-- **还不确定要构建什么？** 先用 `/opsx:explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何代码之前帮你理清思路。（[探索指南](docs/explore.md)）
+- **还不确定要构建什么？** 先用 `/opsx:explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何代码之前帮你理清思路。（[快速入门](https://openspec.dev/docs/quickstart)）
 - **已经知道自己想要什么？** 直接用 `/opsx:propose <你想要构建的内容>`。
 
 这两者都在默认 profile 中。如果你想要扩展工作流（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:bulk-archive`、`/opsx:onboard`），请通过 `openspec-cn config profile` 选择，然后运行 `openspec-cn update` 应用。
 
-`/opsx:propose` is the canonical name; your tool may spell it `/opsx-propose` (Cursor, GitHub Copilot), `@opsx-propose` (Amazon Q) or `$openspec-propose` (Codex). `openspec init` prints the right form for the tools you picked — see [How To Invoke](docs/supported-tools.md#how-to-invoke).
+`/opsx:propose` 是规范名称；你的工具可能拼作 `/opsx-propose`（Cursor、GitHub Copilot）、`@opsx-propose`（Amazon Q）或 `$openspec-propose`（Codex）。`openspec init` 会为你选择的工具打印正确的形式 —— 见[支持的工具](https://openspec.dev/docs/supported-tools)。
 
 > [!NOTE]
-> Not sure if your tool is supported? [View the full list](docs/supported-tools.md) – we support 30+ tools and growing.
+> 不确定你的工具是否受支持？[查看完整列表](https://openspec.dev/docs/supported-tools) —— 我们支持 30+ 种工具且持续增长。
 >
-> 同样支持 Homebrew、pnpm、yarn、bun 和 Nix。可查看 [安装选项](docs-lab/start/installation.md)。
+> 同样支持 Homebrew、pnpm、yarn、bun 和 Nix。可查看[安装选项](https://openspec.dev/docs/installation)。
 
 ## 文档
 
-**从这里开始：** 查看 **[文档首页](docs/README.md)** 获取全貌。刚接触 OpenSpec？先读 [快速入门](docs/getting-started.md)，然后看 [命令如何工作](docs/how-commands-work.md)（了解 `/opsx:propose` 在哪里输入）。
+完整文档见 **[openspec.dev/docs](https://openspec.dev/docs)**。
 
-→ **[快速入门](docs/getting-started.md)**：第一步<br>
-→ **[先探索](docs/explore.md)**：用 `/opsx:explore` 想清楚再动手<br>
-→ **[命令如何工作](docs/how-commands-work.md)**：斜杠命令在哪运行 vs CLI<br>
-→ **[核心概念一览](docs/overview.md)**：一页看懂整个心智模型<br>
-→ **[示例与菜谱](docs/examples.md)**：真实变更，从开始到完成<br>
-→ **[工作流](docs/workflows.md)**：组合与模式<br>
-→ **[存量项目](docs/existing-projects.md)**：在已有代码库中引入 OpenSpec<br>
-→ **[编辑变更](docs/editing-changes.md)**：更新制品、回退、处理手动编辑<br>
-→ **[命令](docs/commands.md)**：斜杠命令与技能<br>
-→ **[CLI](docs/cli.md)**：终端参考手册<br>
-→ **[Stores](docs/stores-beta/user-guide.md)**：在独立仓库中规划，团队共享（Beta）<br>
-→ **[支持的工具](docs/supported-tools.md)**：工具集成与安装路径<br>
-→ **[概念](docs/concepts.md)**：整体如何运转<br>
-→ **[多语言](docs/multi-language.md)**：多语言支持<br>
-→ **[自定义](docs/customization.md)**：打造你的版本<br>
-→ **[社区展示](docs/community.md)**：基于 OpenSpec 构建的项目与资源<br>
-→ **[FAQ](docs/faq.md)** · **[故障排查](docs/troubleshooting.md)** · **[术语表](docs/glossary.md)**：快速帮助
+→ **[快速入门](https://openspec.dev/docs/quickstart)**：你的第一个变更，从开始到完成<br>
+→ **[配置你的项目](https://openspec.dev/docs/setup)**：`openspec init` 安装了什么<br>
+→ **[CLI](https://openspec.dev/docs/cli)**：终端参考手册<br>
+→ **[支持的工具](https://openspec.dev/docs/supported-tools)**：工具集成与安装路径<br>
+→ **[自定义](https://openspec.dev/docs/customize)**：profile、项目配置与 schema<br>
+→ **[Stores](https://openspec.dev/docs/stores)**：在独立仓库中规划，团队共享（Beta）<br>
+→ **[社区展示](docs/community.md)**：基于 OpenSpec 构建的项目与资源
 
 
 ## 社区 Schema

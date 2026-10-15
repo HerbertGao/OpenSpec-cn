@@ -190,7 +190,7 @@ openspec/changes/add-dark-mode/
 ├── proposal.md           # Why and what
 ├── design.md             # How (technical approach)
 ├── tasks.md              # Implementation checklist
-├── .openspec.yaml        # Change metadata (optional): schema, created, skip_specs, retire_capabilities
+├── .openspec.yaml        # Change metadata (optional): schema, created, skip_specs, retire_capabilities, plus your own x-* keys
 └── specs/                # Delta specs
     └── ui/
         └── spec.md       # ui/spec.md 中正在变化的内容

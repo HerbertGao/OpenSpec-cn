@@ -13,6 +13,7 @@ import {
   extractRequirementsSection,
   diffScenarioNames,
   describeScenarioBalance,
+  describeUnappliedContent,
   foldRequirementName,
   parseDeltaSpec,
   normalizeRequirementName,
@@ -249,6 +250,11 @@ export async function buildUpdatedSpec(
         `这不是 delta 章节，因此未被应用。` +
         `请将其移到 ADDED/MODIFIED/REMOVED/RENAMED Requirements 之下。`
     );
+  }
+
+  // Archive carries requirement blocks only; name any other text it leaves behind.
+  for (const lost of plan.unappliedContent) {
+    warn(`${specName} - ${describeUnappliedContent(lost)} (line ${lost.line}) is not carried into the main spec.`);
   }
 
   // Pre-validate duplicates within sections

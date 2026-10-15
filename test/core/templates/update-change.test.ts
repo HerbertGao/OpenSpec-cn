@@ -40,9 +40,9 @@ const STEP_FIVE = `5. **确认并应用，一次一个制品**
    - 展示每个提议的修订及其原因 — 包括步骤 4 中起草的请求编辑。仅在用户确认后写入。
    - 若用户拒绝修订，不要写入 — 保持该制品不变。
    - 当需要重大重写时，先获取该制品的规则和模板：
-     \`\`\`bash
+     ```bash
      openspec-cn instructions "<artifact-id>" --change "<name>" --json
-     \`\`\`
+     ```
 
 `;
 
@@ -55,7 +55,7 @@ const SANCTIONED_OUTSIDE_STEP_FIVE = [
   STEP_FOUR_DRAFT_RULE,
   '那是起始编辑点。',
   '不要写入 `resolvedOutputPath`',
-  '- 仅编辑 `existingOutputPaths` 中的具体文件；绝不要写入 glob `resolvedOutputPath`。',
+  '- 仅编辑 `existingOutputPaths` 中的具体文件，外加部分填充的 glob 制品（第 4 步）下允许的、已确认的具体路径；绝不要写入 glob `resolvedOutputPath`。',
   '- 在写入前与用户确认每个编辑。',
   '`/opsx:apply`',
   '（任务已勾选 / 已 apply）',
@@ -288,6 +288,45 @@ describe('update-change templates', () => {
       expect(writeGuard, label).toContain('仍在范围内、未被跳过且已部分填充');
       expect(writeGuard, label).toContain('重复上述具体路径检查');
       expect(body, label).toContain('停止并与用户调和，而不是替换现有内容或另选路径');
+    }
+  });
+
+  // #2068：最初的护栏写的是"仅编辑 existingOutputPaths 中的具体文件"，而第 4 步创建的文件
+  // 按定义不在这个列表里。例外规则在两个要点之下，遵循一刀切规则的代理会拒绝
+  // glob 补齐流程本来要执行的操作。凡是陈述范围规则的地方都必须携带例外——
+  // 只改护栏一段会漏掉在例外出现前两步就陈述了同一规则的第 2 步。
+  it('在所有陈述范围规则之处携带 glob 新文件例外（#2068）', () => {
+    for (const [label, body] of bodies) {
+      const scopeLines = body
+        .split('\n')
+        .filter((line) =>
+          /- 仅编辑 `existingOutputPaths`|要编辑的文件是 `artifactPaths/.test(line)
+        );
+      // 两处：第 2 步的正文与护栏要点。
+      expect(scopeLines.length, `${label}: 期望两处范围规则`).toBe(2);
+
+      for (const line of scopeLines) {
+        expect(line, `${label}: 未限定条件的范围规则：${line}`).toContain(
+          '部分填充的 glob 制品（第 4 步）下允许的、已确认的具体路径'
+        );
+      }
+
+      // 改写措辞不得恢复未限定条件的禁令。
+      expect(body, label).not.toMatch(/existingOutputPaths`；\s*绝不要写入 glob/);
+      expect(body, label).not.toMatch(/existingOutputPaths` — 磁盘上存在的具体文件[^。]*。\s*不要写入/);
+
+      // 禁令本身与构建边界规则必须在此修复中保留。
+      const guardrails = body.slice(body.indexOf('**护栏**'));
+      expect(guardrails, label).toContain('绝不要写入 glob `resolvedOutputPath`');
+      expect(guardrails, label).toContain(
+        '新文件的唯一允许范围是 `existingOutputPaths` 非空的 glob 制品下一个已确认的具体路径。'
+      );
+
+      // "（第 4 步）"是交叉引用；钉住第 4 步仍然是拥有确认与路径检查的步骤，
+      // 这样重新编号或移动流程就不会留下悬空指针。
+      const stepFour = section(body, '4. **读取并调和**', '5. **确认并应用', `${label} step 4`);
+      expect(stepFour, label).toContain('`existingOutputPaths` 非空的 glob 制品');
+      expect(stepFour, label).toContain('仅在用户确认后创建');
     }
   });
 

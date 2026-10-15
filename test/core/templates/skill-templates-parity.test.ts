@@ -1257,6 +1257,19 @@ describe('skill templates split parity', () => {
       expect(text, variant).not.toContain('Loose prose left under `## Requirements` does NOT block');
     }
   });
+  // explore 捕获表格指明的是 spec-driven 文件；没有这一说明，使用自定义 schema
+  // 的代理会提议写入 schema 从未定义的制品（#2084）。
+  it('把 explore 捕获表格限定到默认 schema', () => {
+    const variants = [
+      ['explore skill', getExploreSkillTemplate().instructions],
+      ['explore command', getOpsxExploreCommandTemplate().content],
+    ] as const;
+    for (const [variant, text] of variants) {
+      expect(text, variant).toContain(
+        '下表是默认 spec-driven schema 的记录位置。使用其他 schema 时，请把每条洞察记录到 `artifactPaths` 中最适合它的产出物里'
+      );
+    }
+  });
 });
 
 describe('apply skill/command shared instruction core', () => {

@@ -117,7 +117,7 @@ ${CONTINUE_SCOPE_NOTE}
 
    制品 ID 和路径来自活动 schema — 不要假设它们，且不要基于硬编码的制品名称分支。自定义 schema 必须能不加修改地工作。
 
-   要编辑的文件是 \`artifactPaths.<id>.existingOutputPaths\` — 磁盘上存在的具体文件，已对 glob 制品（例如 \`specs/**/*.md\`）进行 glob 展开。不要写入 \`resolvedOutputPath\`：对于 glob 制品，它仍是 glob 模式，而非真实文件。
+   要编辑的文件是 \`artifactPaths.<id>.existingOutputPaths\` — 磁盘上存在的具体文件，已对 glob 制品（例如 \`specs/**/*.md\`）进行 glob 展开，外加部分填充的 glob 制品（第 4 步）下允许的、已确认的具体路径。不要写入 \`resolvedOutputPath\`：对于 glob 制品，它仍是 glob 模式，而非真实文件。
 
 3. **理解请求**
    - 若用户请求了特定修订（"design 现在使用 X"），那是起始编辑点。
@@ -161,7 +161,7 @@ ${CONTINUE_SCOPE_NOTE}
 **护栏**
 - 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，${APPLY_GUARDRAIL}。
 - 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
-- 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
+- 仅编辑 \`existingOutputPaths\` 中的具体文件，外加部分填充的 glob 制品（第 4 步）下允许的、已确认的具体路径；绝不要写入 glob \`resolvedOutputPath\`。
 - 不要推进构建边界：若制品的 \`existingOutputPaths\` 为空且状态为 \`ready\` 或 \`blocked\`，${CONTINUE_FRONTIER}。保持 \`skipped\` 制品不动。新文件的唯一允许范围是 \`existingOutputPaths\` 非空的 glob 制品下一个已确认的具体路径。
 - 在写入前与用户确认每个编辑。
 - 若请求更改的是变更的*意图*而非细化，${INTENT_CHANGE_GUARDRAIL}。`,
@@ -217,7 +217,7 @@ ${CONTINUE_SCOPE_NOTE}
 
    制品 ID 和路径来自活动 schema — 不要假设它们，且不要基于硬编码的制品名称分支。自定义 schema 必须能不加修改地工作。
 
-   要编辑的文件是 \`artifactPaths.<id>.existingOutputPaths\` — 磁盘上存在的具体文件，已对 glob 制品（例如 \`specs/**/*.md\`）进行 glob 展开。不要写入 \`resolvedOutputPath\`：对于 glob 制品，它仍是 glob 模式，而非真实文件。
+   要编辑的文件是 \`artifactPaths.<id>.existingOutputPaths\` — 磁盘上存在的具体文件，已对 glob 制品（例如 \`specs/**/*.md\`）进行 glob 展开，外加部分填充的 glob 制品（第 4 步）下允许的、已确认的具体路径。不要写入 \`resolvedOutputPath\`：对于 glob 制品，它仍是 glob 模式，而非真实文件。
 
 3. **理解请求**
    - 若用户请求了特定修订（"design 现在使用 X"），那是起始编辑点。
@@ -261,7 +261,7 @@ ${CONTINUE_SCOPE_NOTE}
 **护栏**
 - 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，${APPLY_GUARDRAIL}。
 - 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
-- 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
+- 仅编辑 \`existingOutputPaths\` 中的具体文件，外加部分填充的 glob 制品（第 4 步）下允许的、已确认的具体路径；绝不要写入 glob \`resolvedOutputPath\`。
 - 不要推进构建边界：若制品的 \`existingOutputPaths\` 为空且状态为 \`ready\` 或 \`blocked\`，${CONTINUE_FRONTIER}。保持 \`skipped\` 制品不动。新文件的唯一允许范围是 \`existingOutputPaths\` 非空的 glob 制品下一个已确认的具体路径。
 - 在写入前与用户确认每个编辑。
 - 若请求更改的是变更的*意图*而非细化，${INTENT_CHANGE_GUARDRAIL}。`

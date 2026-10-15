@@ -22,11 +22,7 @@ overrides:
   # only (transitive via postcss); this is a statically exported site with no server
   # runtime. Remove once transitive nanoid is >=3.3.17 (check: pnpm why nanoid).
   nanoid@<3.3.17: '>=3.3.17 <4'
-  # source-map-js event-loop DoS (vulnerable <1.2.2). Dev-only (serve > chokidar
-  # types chain); never in the static site runtime. Remove once transitive
-  # source-map-js is >=1.2.2 (check: pnpm why source-map-js).
-  source-map-js@<1.2.2: ^1.2.2
-  # compression memory-exhaustion DoS (vulnerable <1.8.2). Dev-only
-  # (serve > compression); this is a statically exported site with no server
-  # runtime. Remove once transitive compression is >=1.8.2 (check: pnpm why compression).
-  compression@<1.8.2: ^1.8.2
+  # GHSA-vc2v-76pw-4v95 — compression memory-leak DoS on premature response close.
+  # Dev-only (serve > compression); never in the static site. Remove once
+  # transitive compression is >=1.8.2 (check: pnpm why compression).
+  compression@<1.8.2: '>=1.8.2 <2'

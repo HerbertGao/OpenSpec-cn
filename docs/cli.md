@@ -666,6 +666,17 @@ retire_capabilities: true
 openspec-cn archive retire-legacy --yes
 ```
 
+**保留你自己的元数据:** 以小写 `x-` 开头的顶层键归你所有。OpenSpec 从不读取、写入或报告它,因此携带工具专属数据的 `openspec validate --strict` 校验依然通过:
+
+```yaml
+# openspec/changes/add-dark-mode/.openspec.yaml
+schema: spec-driven
+x-tracker: SB-5497
+x-jiraKey: ABC-1
+```
+
+前缀之后的名称由你自行选择,大小写或拼写不限,只要不为空且不含空白字符即可。有两个限制:前缀本身必须小写,所以 `X-Tracker` 仍会被报告;扩展键只能是顶层键——`initiative:` 内部的键无论叫什么都会被拒绝。其他无法识别的顶层键仍会被报告为无效。
+
 当该变更移除了此能力的最后一条需求时,OpenSpec 会删除其活跃的 `spec.md`。同一变更中其他能力的增量仍会更新它们的主 spec。若没有该标记,归档会在改动任何文件之前停止,并提示你添加它。
 
 **执行动作:**

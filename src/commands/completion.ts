@@ -1,4 +1,3 @@
-import ora from 'ora';
 import { CompletionFactory } from '../core/completions/factory.js';
 import { COMMAND_REGISTRY } from '../core/completions/command-registry.js';
 import { detectShell, SupportedShell } from '../utils/shell-detection.js';
@@ -125,6 +124,8 @@ export class CompletionCommand {
     const generator = CompletionFactory.createGenerator(shell);
     const installer = CompletionFactory.createInstaller(shell);
 
+    // 按需加载：`__complete` 与本模块共享，每次 Tab 都会执行，不应为 spinner 付出加载开销
+    const { default: ora } = await import('ora');
     const spinner = ora(`正在安装 ${shell} 补全脚本...`).start();
 
     try {
@@ -234,6 +235,7 @@ export class CompletionCommand {
       }
     }
 
+    const { default: ora } = await import('ora');
     const spinner = ora(`正在卸载 ${shell} 补全脚本...`).start();
 
     try {

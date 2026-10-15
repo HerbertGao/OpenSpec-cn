@@ -42,6 +42,24 @@ initiative:
 
 授权归档时退役某项能力。当本变更的 REMOVED 增量移除了某能力所拥有的最后一条需求时，归档会删除该能力的主 spec，而不是中止。此标志之所以存在，是因为删除只能通过 git 恢复，所以由作者决定。
 
+### 扩展键
+
+以小写 `x-` 开头的顶层键归你所有，用于存放其他工具或你的团队保存在变更旁边的数据，例如追踪 ID 或负责人：
+
+```yaml
+schema: spec-driven
+x-tracker: SB-5497
+x-jiraKey: ABC-1
+x-owner:
+  team: payments
+```
+
+- **名称**：小写 `x-` 前缀后跟至少一个字符，任何位置都不能有空白字符。前缀之后大小写或拼写不限，所以 `x-jiraKey` 和 `x-trackerID` 均可。`X-Tracker`、裸的 `x-` 和 `x- tracker` 均不行，会被报告为未知键。
+- **值**：任意 YAML 值。OpenSpec 不读取也不校验它，且不改变任何行为。
+- **范围**：仅限顶层。`initiative` 内部的 `x-` 键与其他键一样仍会被拒绝。
+- **校验**：扩展键永远不会被报告为未知，因此携带它们的变更可以通过 `openspec validate --strict`。
+- **归档**：该文件随变更原样移动，扩展键一并保留。
+
 ## 示例
 
 一个填写完整的 .openspec.yaml：
@@ -61,5 +79,5 @@ affected_areas:
 
 与 [config.yaml](config-yaml.md) 不同，坏值不会仅以警告方式丢弃。元数据错误会中止命令。
 
-- **未知的顶级键**：OpenSpec 会忽略它们。`status`、`instructions`、`validate` 和 `archive` 会报告这些键没有生效。JSON 输出会在结构化结果中携带该警告。
-- **严格校验**：`openspec validate --strict` 会把未知键的警告视为失败。
+- **未知的顶级键**：OpenSpec 会忽略它们。`status`、`instructions`、`validate` 和 `archive` 会报告这些键没有生效。JSON 输出会在结构化结果中携带该警告。[扩展键](#扩展键)不是未知键，永远不会被报告。
+- **严格校验**：`openspec validate --strict` 会把未知键的警告视为失败。仅多出扩展键的变更可以通过。
