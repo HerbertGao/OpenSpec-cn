@@ -178,6 +178,8 @@ openspec-cn list --specs
 
    `<capability-path>` 是相对于 `specs/` 的 spec 目录（例如 `user-auth` 或 `identity/user-auth`）。保留已有 capability 的完整路径，并遵循项目既有的组织方式创建新 capability。
 
+   下表是默认 spec-driven schema 的记录位置。使用其他 schema 时，请把每条洞察记录到 `artifactPaths` 中最适合它的产出物里，并在提议中指明该产出物；不要创建 schema 未定义的产出物。
+
     | 洞察类型             | 记录到哪                        |
     |----------------------------|-------------------------------------|
     | 发现新需求            | `specs/<capability-path>/spec.md` |
@@ -187,7 +189,7 @@ openspec-cn list --specs
     | 识别新工作            | `tasks.md`                   |
     | 假设失效           | 相关产出物                   |
 
-   示例提议：
+   示例提议（默认 schema）：
    - "那是一个设计决定。记到 design.md 里？"
    - "这是一个新需求。加到 specs 里？"
    - "这改变了范围。更新提案？"
@@ -316,7 +318,7 @@ openspec-cn list --specs
 没有必需的结束。探索可能：
 
 - **流入提案**："准备开始了吗？运行 `/openspec-propose`，它就会变成一个变更。"
-- **产出产出物更新**："已用这些决定更新 design.md"
+- **产出产出物更新**："已用这些决定更新设计"
 - **仅提供清晰度**：用户得到所需，继续
 - **稍后继续**："我们可以随时继续这个"
 

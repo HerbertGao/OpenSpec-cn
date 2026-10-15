@@ -771,7 +771,7 @@ describe('ArchiveCommand', () => {
 
       await expect(
         archiveCommand.execute(changeName, { yes: true, noValidate: true, skipSpecs: true })
-      ).rejects.toThrow(/outside the OpenSpec root/u);
+      ).rejects.toThrow(/拒绝通过 OpenSpec 根目录之外的路径进行归档/u);
       await expect(fs.access(path.join(sharedChanges, changeName))).resolves.not.toThrow();
       await expect(fs.readdir(outsideDir)).resolves.toEqual([]);
     });

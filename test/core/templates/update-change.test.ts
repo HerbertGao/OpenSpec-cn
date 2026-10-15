@@ -40,9 +40,9 @@ const STEP_FIVE = `5. **确认并应用，一次一个制品**
    - 展示每个提议的修订及其原因 — 包括步骤 4 中起草的请求编辑。仅在用户确认后写入。
    - 若用户拒绝修订，不要写入 — 保持该制品不变。
    - 当需要重大重写时，先获取该制品的规则和模板：
-     ```bash
+     \`\`\`bash
      openspec-cn instructions "<artifact-id>" --change "<name>" --json
-     ```
+     \`\`\`
 
 `;
 
@@ -313,7 +313,7 @@ describe('update-change templates', () => {
 
       // 改写措辞不得恢复未限定条件的禁令。
       expect(body, label).not.toMatch(/existingOutputPaths`；\s*绝不要写入 glob/);
-      expect(body, label).not.toMatch(/existingOutputPaths` — 磁盘上存在的具体文件[^。]*。\s*不要写入/);
+      expect(body, label).not.toMatch(/existingOutputPaths` — 磁盘上存在的具体文件[^.]*。\s*不要写入/);
 
       // 禁令本身与构建边界规则必须在此修复中保留。
       const guardrails = body.slice(body.indexOf('**护栏**'));
