@@ -88,7 +88,7 @@ OpenSpec 在 `generates` 中识别以下 glob 形式：
 
 **字面文件名**：仅有前导 `!` 并不构成 glob。用 `generates: '!review.md'` 来命名该文件。普通括号如 `(proposal|design).md`，以及单元素花括号如 `review-{api}.md`，同样保持字面。
 
-OpenSpec 拒绝绝对路径、包含 `..` 段的路径，以及花括号或圆括号嵌套超过 16 层的 glob（例如 `{a,{b,{c,...}}}`）。真实的模式只需要一两层。
+OpenSpec 拒绝绝对路径、包含 `..` 段的路径，以及花括号或圆括号嵌套超过 16 层的 glob（例如 `{a,{b,{c,...}}}`）。真实的模式只需要一两层。它也拒绝展开后超过 1,024 个模式的花括号 glob，例如重复十一次的 `{a,b}`，或 `file-{1..5000}.md` 这样的范围。错误信息为 `Artifact output pattern expands to more than 1024 patterns`。真实的模式只会展开出少量结果。
 
 #### 完成判定
 
@@ -146,7 +146,7 @@ OpenSpec 拒绝绝对路径和包含 `..` 段的路径。
 openspec/changes/add-auth/tasks.md
 ```
 
-诸如 `tracks: "**/tasks.md"` 的 glob 会读取每个匹配的文件，例如 `backend/tasks.md` 和 `frontend/tasks.md`。OpenSpec 会合并它们的任务与进度。为制品的 `generates` 字段使用相同的值，让 status 和 list 追踪相同的文件。`generates` 的 16 层花括号限制在这里同样适用。
+诸如 `tracks: "**/tasks.md"` 的 glob 会读取每个匹配的文件，例如 `backend/tasks.md` 和 `frontend/tasks.md`。OpenSpec 会合并它们的任务与进度。为制品的 `generates` 字段使用相同的值，让 status 和 list 追踪相同的文件。`generates` 的花括号限制（16 层深、展开 1,024 个模式）在这里同样适用。
 
 若没有文件匹配，或匹配的文件不含带任务文本的复选框，apply 会保持受阻。OpenSpec 统计这些复选框形式：
 

@@ -678,7 +678,7 @@ describe('artifact loop guards (propose and ff)', () => {
   it('tells the agent how to resolve a glob output path', () => {
     for (const [label, body] of loopBodies) {
       expect(body, label).toContain(
-        '是一个 glob，遵循 `instruction` 选择具体文件路径'
+'在 `changeRoot` 内选择与 glob 匹配的具体路径'
       );
     }
   });

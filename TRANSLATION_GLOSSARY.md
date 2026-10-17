@@ -132,6 +132,13 @@
 | write-capable action | 可写入操作 | explore 模板中需确认才能执行的操作 |
 | confirmation | 确认 | 写文件前的用户确认 |
 | batch | 批处理 | `status --all` / `validate --all` 的批量模式 |
+| glob (pattern) | glob | 保持（如 `specs/**/*.md`）；`brace expansion` 译"花括号展开" |
+| symlink | 符号链接 | 文件/目录链接 |
+| containment | 路径边界约束 | 路径必须落在允许目录内 |
+| spinner | 加载指示器 | CLI 的旋转提示符号；`ora` 文本 |
+| NUL byte | NUL 字节 | 路径中的 `\0` |
+| stack overflow | 栈溢出 | — |
+| out-of-memory | 内存耗尽 | — |
 
 ## 锚点链接处理约定
 

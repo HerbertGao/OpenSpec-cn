@@ -76,18 +76,18 @@ function specDrivenTitles(): Record<string, string> {
 }
 
 const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
-  getExploreSkillTemplate: '8a60eda1602ea844e6d72f1666715f22b90cf3a071c9581f4c26ad631bd4e1ff',
+  getExploreSkillTemplate: '46751fc0c9b02f18e49ab9f21341c9fb5c1e10e4fe72bde6d25a9ae3fa8a8057',
   getNewChangeSkillTemplate: 'd4c27108c84894a66dd373fa0420eba150b40eab5f74653e89cf2bd793271357',
-  getContinueChangeSkillTemplate: 'a0ea9a3cb42f1630f815c91b3cec30d40b672bdc83a9e448512b181f6642e1d5',
+  getContinueChangeSkillTemplate: '9344e7faa6bbd7cc7d6a6b6f358a4f6c09aadc5af4a9a260668e9532d08dde6a',
   getApplyChangeSkillTemplate: '485afd5e780d7f2da0ee998ae274672dec456e31c9131b5f37fcdaca246a11d3',
-  getFfChangeSkillTemplate: '173d55ba88ffd14e9996a218d27ea4a54420797a5f58f26f4f283ad1c190adba',
+  getFfChangeSkillTemplate: 'b27a7b141c72b1a8f57b61695d7a0afbdb3702095160ee010c0950c04666d54c',
   getSyncSpecsSkillTemplate: '9ce7c651ff80b722b52b8bfe0bc27a2b6006dc49fbcc54ef28d6134318538c2a',
   getOnboardSkillTemplate: '00052cea9303911414bfc2daad47c2cbb8fa307f0b9842bd0d1eaf830b31fa9f',
-  getOpsxExploreCommandTemplate: '9c3e6d0248ba72dcc3dfde90ba4f57c7b7c04309bfc70d3249dd0c5e60dd9c55',
+  getOpsxExploreCommandTemplate: '127a9b634fc7e42dcfe6140ce57ef8fa127a3958defdfdd685475a678ddb9123',
   getOpsxNewCommandTemplate: '10109ef4af26839acd9aa1ad3ddaaeaef9cde3fa263d43666cdf0f7eb6cde245',
-  getOpsxContinueCommandTemplate: 'a1a3a024830ca76e7390aa754347e015cdc0d5f1abd89490693b76123cec771a',
+  getOpsxContinueCommandTemplate: '0b9597023fcb0ded78d877f699e4c1f6548b733b9cd49cf770f4c4857132d98a',
   getOpsxApplyCommandTemplate: '7df5cd4c6c449b824eaea1ef176f7573db56a74edaef3790d45ab3e6e4f4765f',
-  getOpsxFfCommandTemplate: 'dbdab0154c40bec47755cc2e5520310a7a9775e444ad48649b0d7617730416e5',
+  getOpsxFfCommandTemplate: '3a0c37d17535c69b0f11f42bf814c33b375ae49d88ff16e1ab0d9e32d02ff2b9',
   getArchiveChangeSkillTemplate: 'cdc7cea01dab90bd78f4281029a500a3a56426ed04e64eab118d22cfc5895d18',
   getBulkArchiveChangeSkillTemplate: '71e23e413297abbac4bb777db5850106ec156bbbd44a6b74ca8014775d51bebe',
   getOpsxSyncCommandTemplate: 'c22bc6c6f9a2cfa541d6b40a937dfbd3102de2da9d07b7cb729dc857ab7e3aaa',
@@ -96,25 +96,25 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getOpsxOnboardCommandTemplate: '5cc8b8af772d26adc67a36e2eeb093281ec6294e0b87b175ec73dd9831c10c1e',
   getOpsxBulkArchiveCommandTemplate: '47eb39094309fd0bc3fccf4b9e43dff2162097453c8fc444bb2a2248f631552b',
   getOpsxVerifyCommandTemplate: '4706f08e63cceba585e92ad9ea7682090f23a92a501ba6e819b77d9f5f81a986',
-  getOpsxProposeSkillTemplate: 'a3733d61671921dc71345890b303e001f7303223bdf325cf831d5bdff3b7844d',
-  getOpsxProposeCommandTemplate: 'ed8a847f2b11494ab5b01ae931dd1e87a21b265c2911a72e2bdf523a12342bcd',
+  getOpsxProposeSkillTemplate: '75f5b38d7592e3416efa2fcca596bf0dc4b91940814d13ecc252bda67db8f743',
+  getOpsxProposeCommandTemplate: '4080acac61ef1bb1909f03ff16a04b15d8fe4370cca7ed4cefccf729d64cc88d',
   getFeedbackSkillTemplate: '4d3252e3a359d4769bf36166ac6f486e92d7797e922bf9707808f6437ab022ef',
   getUpdateChangeSkillTemplate: 'be970c9fc1b9cda79b1b186ca7c35c4702a070910c0fc97b782df79a80893305',
   getOpsxUpdateCommandTemplate: '21c70d8fa89f6f431c99b29fd8b03c10cb8f8da90f9befe86835dd4df2df881c',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
-  'openspec-explore': '8ab325001417ca2ff9ea547fa2fa53fed55bcda548379778a90791a92d3c02d4',
+  'openspec-explore': '9fc875d2fd26a3a56d98c006033d9301b31af9fdddf1b1ef62520877d8cb39bb',
   'openspec-new-change': 'ee8d7c38b343a763839c191473a9e7ea115d547abeaa153b1e5abf4186244b87',
-  'openspec-continue-change': '019cbeb65891ff767c94f8a66fa4ce9bb25ed201bec490606836b2af6cf15e5b',
+  'openspec-continue-change': '2aeb7f7f17f47c6fd994ae654875c606da23ecaf7417b5ef822f3971f086d571',
   'openspec-apply-change': 'cd637b44f14d77a9bf8479e5ccc14527db5893eb909b321bdcbe52a88f23a53c',
-  'openspec-ff-change': '80a27e0ce17c37627edda59aaea7569ef0d194bab1d0515f6d710676e439ebf7',
+  'openspec-ff-change': 'a0172c43b94ce89226be8827d31174097dab9397d70dd5b2c1f300a049663ef8',
   'openspec-sync-specs': '744ed75eef21d26e02116740dbfb469ddcb79ef5242edcc2002d287422948dd9',
   'openspec-archive-change': 'b5e22066a9be04f0c098aebfdf415233160727566afe9fc8b35ee5fb8078fb52',
   'openspec-bulk-archive-change': '1c0554a12830b0fbe502d7e8148ea6281307e6d7c132f9aa9cd6574c79cc1fab',
   'openspec-verify-change': '4687caa8505c4e33c7507f8db6787f5a73cc262c97d621b46ab6ace3cf7500c5',
   'openspec-onboard': '344bd1f20016355702d3793346f81bee6a52a560cb1b27df504b84e92fe8670e',
-  'openspec-propose': 'a294c2cb4dbcd497a2787993e97dea691a553fade2848076e2df083558deefc2',
+  'openspec-propose': '57d0c69468e07e35533a3559a1a15bfb4c454c552deddfe26a0d5ca6d613272e',
   'openspec-update-change': '080fc113df642aea5f2ce5a03fbe94ac548d61124de6819fdccc57a4b6431aec',
 };
 
@@ -1216,15 +1216,17 @@ describe('skill templates split parity', () => {
       expect(content, variant).toContain('权威指导');
       expect(content, variant).not.toContain('常见产出物模式');
 
-      // Delegated creation is honored at the creation step itself, and the
-      // delegated skill's output is verified rather than assumed.
+      // Delegated creation is honored at the creation step itself, held to the
+      // output path already chosen and checked (#2099), and the delegated
+      // skill's output is verified rather than assumed.
       expect(content, variant).toContain(
-        '若 `instruction` 字段将创建委托给特定 skill 或命令，则调用它来生成产出物，而不是自己写入文件，然后验证产出物文件是否存在于 `resolvedOutputPath`'
+        '若 `instruction` 字段将创建委托给特定 skill 或命令，则仅当它能把产出物写入该输出路径时才调用它；否则停止并告知用户'
       );
+      expect(content, variant).toMatch(/验证产出物文件存在于该输出路径/u);
 
       // ...and restated in the artifact-creation guidelines.
       expect(content, variant).toContain(
-        '若 `instruction` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物'
+        '若 `instruction` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物 —— 但仅在已选定并检查过输出路径之后，且仅当它能写入该处时才调用'
       );
     }
   });
