@@ -68,8 +68,11 @@
       # "latest" is not trusted. SHA256SUMS is uploaded last: a release that
       # has it is complete.
       $feed = ''
-      # "$releases.atom" is a property lookup and is empty.
-      try { $feed = (Invoke-WebRequest -UseBasicParsing -Uri "${releases}.atom").Content } catch { Write-Verbose "No release feed: $_" }
+      # PowerShell 7 returns a byte array unless the feed is a text type.
+      try {
+        $raw = (Invoke-WebRequest -UseBasicParsing -Uri "$releases.atom").Content
+        $feed = if ($raw -is [byte[]]) { [Text.Encoding]::UTF8.GetString($raw) } else { [string]$raw }
+      } catch { Write-Verbose "No release feed: $_" }
       $tags = @([regex]::Matches($feed, '/releases/tag/(v\d+\.\d+\.\d+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
       foreach ($tag in $tags) {
         try {
