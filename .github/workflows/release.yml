@@ -35,3 +35,31 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm run release:ci
+
+  # This fork publishes by pushing a tag. release-prepare.yml still only runs
+  # when github.repository is Fission-AI/OpenSpec, so it never creates the
+  # GitHub Release that binaries.yml attaches standalone files to.
+  github-release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - name: Create the release and build standalone binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -eu
+          tag="${GITHUB_REF_NAME}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "GitHub Release ${tag} already exists."
+          else
+            case "$tag" in
+              *-* ) gh release create "$tag" --title "$tag" --notes "Release ${tag}." --prerelease ;;
+              * ) gh release create "$tag" --title "$tag" --notes "Release ${tag}." ;;
+            esac
+          fi
+          # A release created with GITHUB_TOKEN does not start other workflows.
+          gh workflow run binaries.yml --ref main -f tag="$tag"
