@@ -133,8 +133,12 @@ describe('verify checks each requirement by its delta operation', () => {
     expect(removed, label).toContain('`<planningHome.root>/openspec/specs/<capability-path>/spec.md`');
     expect(removed, label).toContain('其正文和场景就是必须消失的行为的证据');
     expect(removed, label).toContain('绝不仅凭需求名称去搜索');
-    // 字面标题查找会漏掉措辞不同的基线，并被误读为"同步已将其移除"。
-    expect(removed, label).toContain('按规范化名称匹配');
+    // 只按精确规范化名称匹配（#2098）：同步之后，名称相近的 ADDED 需求
+    // 不得被当作被移除需求的基线。
+    expect(removed, label).toContain('按精确规范化名称匹配');
+    expect(removed, label).toContain('按大小写敏感比较');
+    expect(removed, label).toContain('措辞相近的标题不算匹配');
+    expect(removed, label).not.toContain('近似名称');
   });
 
   // 基线读取、历史回退与搜索必须保持这个顺序。每个索引都先检查存在：

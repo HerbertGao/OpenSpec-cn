@@ -139,6 +139,18 @@ npm install -g @studyzy/openspec-cn@latest
 brew install openspec
 ```
 
+偏好单文件、无需 Node.js 的独立安装（standalone）？macOS 和 Linux：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.sh | sh
+```
+
+Windows（PowerShell）：
+
+```powershell
+irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
+```
+
 然后进入你的项目目录并初始化：
 
 ```bash
@@ -201,7 +213,9 @@ AI 编程助手很强大，但当需求只存在于聊天记录里时，结果�
 
 ## 更新 OpenSpec
 
-**升级包版本**
+**升级 CLI**
+
+使用独立安装（standalone）的，运行 `openspec-cn install` 原地替换。用 npm 安装的，执行：
 
 ```bash
 npm install -g @studyzy/openspec-cn@latest
@@ -229,7 +243,7 @@ openspec-cn update
 
 ## 参与贡献
 
-**小修小补** —— Bug 修复、错别字修正与小型改进可以直接提交 PR。
+**每项改动都从 issue 开始。** 我们在 issue 中讨论；如果决定推进，由维护者实现这项改动，或邀请你与我们一起构建。
 
 **汉化问题** —— 因为汉化导致的 Bug 修复、错别字修正与小型改进建议可以直接提交 [Issue](https://github.com/studyzy/OpenSpec-cn/issues)。
 

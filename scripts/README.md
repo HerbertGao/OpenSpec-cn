@@ -70,3 +70,23 @@ test file mid-suite.
 ## pack-version-check.mjs
 
 Validates package version consistency before publishing.
+
+## binary/
+
+构建独立的 `openspec-cn` 可执行文件（无需 Node.js），这是用户安装 OpenSpec 的默认方式。`.github/workflows/binaries.yml` 在 Linux 上交叉编译全部资产，在各自的系统和 CPU 上逐一测试，然后把它们与 `SHA256SUMS`、`install.sh`、`install.ps1` 一并附加到每个已发布的发布版。
+
+| 文件 | 说明 |
+|---|---|
+| `build.mjs` | 把资产构建到 `dist-bin/`（需先运行 `pnpm build`） |
+| `entry.mjs` | 二进制的入口：内嵌 Schema、升级提示 |
+| `install.sh` / `install.ps1` | 用户实际运行的安装脚本（macOS/Linux、Windows） |
+| `smoke.sh` | 对单个二进制做快速检查 |
+| `e2e.sh` | 用单个二进制代替 Node 运行全部 CLI 测试 |
+
+```bash
+pnpm build
+bun scripts/binary/build.mjs                    # 本机
+bun scripts/binary/build.mjs --all              # 全部发布资产
+bash scripts/binary/smoke.sh dist-bin/openspec-cn-<asset>
+bash scripts/binary/e2e.sh dist-bin/openspec-cn-<asset>
+```

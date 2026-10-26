@@ -95,8 +95,8 @@ ${PROJECT_ROOT_GUARD}
        - 添加 CRITICAL 问题："未找到需求：<需求名>"
        - 建议："实现需求 X：<描述>"
      - 对每条 REMOVED 需求，变更要求该行为消失，因此反转检查：
-       - REMOVED 块只携带需求名称以及可选的 \`**Reason**\`/\`**Migration**\` 说明，delta 本身并不描述该行为。搜索之前，先读取主 spec 中 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 的基线需求（与 delta spec 使用相同的 capability 路径），按规范化名称匹配，扫描该文件的需求标题，而不是对 delta 的确切标题做字符串匹配。其正文和场景就是必须消失的行为的证据；绝不仅凭需求名称去搜索。
-       - 若该文件在此名称或近似名称下都没有该需求——例如早前的同步已应用了移除——则从同一文件的历史恢复基线，注意在规划仓库而非当前目录中执行：\`git -C "<planningHome.root>" log -p -- openspec/specs/<capability-path>/spec.md\`，或在确定应用移除的提交后使用 \`git -C "<planningHome.root>" show <commit>^:./openspec/specs/<capability-path>/spec.md\`。输出为空意味着 pathspec 未匹配到任何东西，而非没有基线：\`git log\` 对未匹配的路径也会报告成功，所以在从沉默得出结论之前请重新检查路径。
+       - REMOVED 块只携带需求名称以及可选的 \`**Reason**\`/\`**Migration**\` 说明，delta 本身并不描述该行为。搜索之前，先读取主 spec 中 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 的基线需求（与 delta spec 使用相同的 capability 路径），并按精确规范化名称匹配——这也是 OpenSpec 应用 REMOVED 区块时采用的规则：取 \`Requirement:\` 之后的标题文本，去掉首尾空白，仅当其前面是空格或制表符时才丢弃结尾连续的 \`#\`（因此 \`C#\` 保留自己的 \`#\`），并按大小写敏感比较。措辞相近的标题不算匹配；改名应归入 RENAMED。其正文和场景就是必须消失的行为的证据；绝不仅凭需求名称去搜索。
+       - 若该文件中没有此精确规范化名称的需求——例如早前的同步已应用了移除，或一条名称相近的 ADDED 需求取代了它——则从同一文件的历史恢复基线，注意在规划仓库而非当前目录中执行：\`git -C "<planningHome.root>" log -p -- openspec/specs/<capability-path>/spec.md\`，或在确定应用移除的提交后使用 \`git -C "<planningHome.root>" show <commit>^:./openspec/specs/<capability-path>/spec.md\`。输出为空意味着 pathspec 未匹配到任何东西，而非没有基线：\`git log\` 对未匹配的路径也会报告成功，所以在从沉默得出结论之前请重新检查路径。
        - 只在标题上做文章的基线——正文只是复述名称、没有场景——与缺失基线一样不可用。若两处都没有可用的基线，将该条目的 **Spec 覆盖**标记为未验证并写明原因，就此打住：不要搜索，也绝不把未搜索的移除计为通过。
        - 在代码库中搜索该行为。\`openspec/\` 产出物或文档中的匹配，或仅服务于 Migration 说明或某条 ADDED 需求的代码，本身不构成证据。报告任何仍在提供被移除行为的代码路径，包括与 ADDED 需求共享的路径。
        - 找不到实现是预期结果，但前提是你搜索的正是基线行为。绝不把 REMOVED 需求报告为 "未找到需求"，也不建议实现它。
@@ -308,8 +308,8 @@ ${PROJECT_ROOT_GUARD}
        - 添加 CRITICAL 问题："未找到需求：<需求名>"
        - 建议："实现需求 X：<描述>"
      - 对每条 REMOVED 需求，变更要求该行为消失，因此反转检查：
-       - REMOVED 块只携带需求名称以及可选的 \`**Reason**\`/\`**Migration**\` 说明，delta 本身并不描述该行为。搜索之前，先读取主 spec 中 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 的基线需求（与 delta spec 使用相同的 capability 路径），按规范化名称匹配，扫描该文件的需求标题，而不是对 delta 的确切标题做字符串匹配。其正文和场景就是必须消失的行为的证据；绝不仅凭需求名称去搜索。
-       - 若该文件在此名称或近似名称下都没有该需求——例如早前的同步已应用了移除——则从同一文件的历史恢复基线，注意在规划仓库而非当前目录中执行：\`git -C "<planningHome.root>" log -p -- openspec/specs/<capability-path>/spec.md\`，或在确定应用移除的提交后使用 \`git -C "<planningHome.root>" show <commit>^:./openspec/specs/<capability-path>/spec.md\`。输出为空意味着 pathspec 未匹配到任何东西，而非没有基线：\`git log\` 对未匹配的路径也会报告成功，所以在从沉默得出结论之前请重新检查路径。
+       - REMOVED 块只携带需求名称以及可选的 \`**Reason**\`/\`**Migration**\` 说明，delta 本身并不描述该行为。搜索之前，先读取主 spec 中 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 的基线需求（与 delta spec 使用相同的 capability 路径），并按精确规范化名称匹配——这也是 OpenSpec 应用 REMOVED 区块时采用的规则：取 \`Requirement:\` 之后的标题文本，去掉首尾空白，仅当其前面是空格或制表符时才丢弃结尾连续的 \`#\`（因此 \`C#\` 保留自己的 \`#\`），并按大小写敏感比较。措辞相近的标题不算匹配；改名应归入 RENAMED。其正文和场景就是必须消失的行为的证据；绝不仅凭需求名称去搜索。
+       - 若该文件中没有此精确规范化名称的需求——例如早前的同步已应用了移除，或一条名称相近的 ADDED 需求取代了它——则从同一文件的历史恢复基线，注意在规划仓库而非当前目录中执行：\`git -C "<planningHome.root>" log -p -- openspec/specs/<capability-path>/spec.md\`，或在确定应用移除的提交后使用 \`git -C "<planningHome.root>" show <commit>^:./openspec/specs/<capability-path>/spec.md\`。输出为空意味着 pathspec 未匹配到任何东西，而非没有基线：\`git log\` 对未匹配的路径也会报告成功，所以在从沉默得出结论之前请重新检查路径。
        - 只在标题上做文章的基线——正文只是复述名称、没有场景——与缺失基线一样不可用。若两处都没有可用的基线，将该条目的 **Spec 覆盖**标记为未验证并写明原因，就此打住：不要搜索，也绝不把未搜索的移除计为通过。
        - 在代码库中搜索该行为。\`openspec/\` 产出物或文档中的匹配，或仅服务于 Migration 说明或某条 ADDED 需求的代码，本身不构成证据。报告任何仍在提供被移除行为的代码路径，包括与 ADDED 需求共享的路径。
        - 找不到实现是预期结果，但前提是你搜索的正是基线行为。绝不把 REMOVED 需求报告为 "未找到需求"，也不建议实现它。

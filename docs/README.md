@@ -107,7 +107,7 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 6. 归档          (在你的 AI 聊天中)  /opsx:archive
 ```
 
-第 1 步和第 2 步发生在你的终端里。其余步骤发生在你的 AI 助手的聊天中。这一分工是唯一点得记住的东西,而 [命令是如何工作的](how-commands-work.md) 精确解释了原因。第 3 步是可选的,但在不确定时从 `/opsx:explore` 开始,是最值得养成的习惯。
+第 1 步和第 2 步发生在你的终端里（Windows 或其他安装方式见[安装](installation.md)）。其余步骤发生在你的 AI 助手的聊天中。这一分工是唯一点得记住的东西,而 [命令是如何工作的](how-commands-work.md) 精确解释了原因。第 3 步是可选的,但在不确定时从 `/opsx:explore` 开始,是最值得养成的习惯。
 
 ## 还有其他获取帮助的渠道
 
@@ -115,4 +115,4 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 - **GitHub Issues:** [github.com/studyzy/OpenSpec-cn/issues](https://github.com/studyzy/OpenSpec-cn/issues),用于报告 bug 和提出功能请求。
 - **`openspec-cn feedback "你的消息"`** 直接从你的终端发送反馈(它会打开一个 GitHub issue)。
 
-在这些文档中发现有误、过时或令人困惑的内容?那就是一个 bug。请提交 issue 或 PR。文档改进是你所能做出的最有价值的贡献之一。
+在这些文档中发现有误、过时或令人困惑的内容?那就是一个 bug。请提交一个[文档 issue](https://github.com/studyzy/OpenSpec-cn/issues/new?template=docs.yml)。文档改进是你所能做出的最有价值的贡献之一。

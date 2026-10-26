@@ -177,6 +177,8 @@ openspec-cn update [path] [options]
 | 选项 | 描述 |
 |--------|-------------|
 | `--force` | 即使文件已是最新也强制更新 |
+| `--dry-run` | 报告更新会做哪些改动，不写入任何内容 |
+| `--json` | 与 `--dry-run` 搭配时，以 JSON 打印计划中的改动 |
 
 **示例:**
 
@@ -185,6 +187,31 @@ openspec-cn update [path] [options]
 npm install -g @studyzy/openspec-cn@latest
 openspec-cn update
 ```
+
+**预览更新:**
+
+`--dry-run` 会报告一次更新将新增、修改或删除的文件，并且不写入任何内容。
+路径相对于项目；项目之外的文件（你主目录下的 skills）会以 `~/` 前缀显示。
+
+```bash
+openspec-cn update --dry-run --json
+```
+
+```json
+{
+  "changes": [
+    { "path": ".claude/skills/openspec-explore/SKILL.md", "action": "update", "tool": "claude" },
+    { "path": "~/.minimax/skills/openspec-propose/SKILL.md", "action": "add", "tool": "minimax-code" }
+  ],
+  "notes": [],
+  "failures": []
+}
+```
+
+这份计划就是非交互式运行会执行的内容，并列出它会触碰的每一个文件：从工具原先目录迁出的移动、为 profile 之前的老安装保存全局配置、Copilot 云端编程 Agent 文件，以及在 `--force` 下的旧版产物清理。属于 OpenSpec 自身而非某个工具的文件会标为 `tool: "openspec"`。`notes` 标记终端用户会被询问的步骤，每项带一个稳定的 `code`：`legacy-tool-directories`（列出为已执行的移动）和 `legacy-artifacts`（没有 `--force` 时更新会保持原样的旧布局文件）。`failures` 列出真实更新会失败的工具，包括它无法完成的写入（文件位置被目录占用、没有写权限）；对这类工具，计划会在真实更新会停下的地方停下，一个损坏的工具不会让你失去计划的其余部分。普通刷新时两者都为空。
+完整参考见 [openspec.dev/docs/cli](https://openspec.dev/docs/cli)。
+
+一次 `--dry-run --json` 失败仍会只打印一个 JSON 文档，即空计划加上 `status` 数组，并以非零码退出。
 
 请先升级包。指令文件由已安装的 CLI 生成,因此在一个陈旧的安装上运行 `openspec-cn update`,会报告一切都是最新的,却不会添加更新版本所附带的工作流。
 

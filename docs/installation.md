@@ -2,7 +2,38 @@
 
 ## 前置条件
 
-- **Node.js 20.19.0 或更高版本** — 检查你的版本:`node --version`
+- **Node.js 20.19.0 或更高版本**(仅包管理器安装需要)— 检查你的版本:`node --version`
+
+<a id="install"></a>
+
+## 独立安装(standalone)
+
+OpenSpec 也可以作为单个文件安装，无需 Node.js 或任何其他依赖(在 Alpine Linux 上需先运行 `apk add libstdc++ libgcc`)。
+
+macOS 和 Linux:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.sh | sh
+```
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
+```
+
+安装器会挑选文件全部齐全的最新发布版本，为你的机器选出正确的文件，用该发布版的 `SHA256SUMS` 校验后再安装到 `~/.local/bin`(Windows:`%LOCALAPPDATA%\Programs\openspec-cn`,并加入你的用户 `PATH`)。设置 `OPENSPEC_INSTALL_DIR` 可换一个目录，或用 `OPENSPEC_VERSION=v1.15.0` 固定某个版本。更想用 npm 或其他包管理器?见[包管理器](#package-managers)。
+
+手动安装时，从[最新发布](https://github.com/studyzy/OpenSpec-cn/releases/latest)下载对应平台的文件，重命名为 `openspec-cn`(Windows 上为 `openspec-cn.exe`)，在 macOS 和 Linux 上赋予执行权限(`chmod +x openspec-cn`)，并把它放到 `PATH` 上:
+
+| 平台 | 文件 |
+|---|---|
+| macOS 13+ (Apple Silicon / Intel) | `openspec-cn-darwin-arm64` / `openspec-cn-darwin-x64` |
+| Linux (glibc 2.17+) | `openspec-cn-linux-x64` / `openspec-cn-linux-arm64` |
+| Alpine 3.17+ (需要 `apk add libstdc++ libgcc`) | `openspec-cn-linux-x64-musl` / `openspec-cn-linux-arm64-musl` |
+| Windows 10+ | `openspec-cn-windows-x64.exe` / `openspec-cn-windows-arm64.exe` |
+
+在 macOS 上，用浏览器下载的文件在运行 `xattr -d com.apple.quarantine openspec-cn` 之前会被拦截;安装脚本没有这个问题。在 Windows 上，第一次从资源管理器中运行时 SmartScreen 可能会警告。
 
 <a id="install-with-your-ai-assistant"></a>
 
@@ -10,7 +41,7 @@
 
 不想手动操作？把下面的提示词粘贴给任何能执行 shell 命令的编程助手 —— Claude Code、Codex、Cursor、Gemini CLI、Copilot，以及其余[支持的工具](supported-tools.md)。它会安装 CLI、初始化本项目，并汇报实际发生了什么。
 
-下面的手动步骤才是事实来源 —— 提示词只是替你把它们跑一遍。如果你的助手中途停下来把事情交还给你，那是有意为之：任何需要特权的操作它都会先询问，并且绝不修改你的 shell 启动文件。这些部分请你自己借助[包管理器](#package-managers)和[故障排查](troubleshooting.md)来完成。
+下面的手动步骤才是事实来源 —— 提示词只是替你把它们跑一遍。如果你的助手中途停下来把事情交还给你，那是有意为之：任何需要特权的操作它都会先询问，并且绝不修改你的 shell 启动文件。这些部分请你自己借助[安装](#install)、[包管理器](#package-managers)和[故障排查](troubleshooting.md)来完成。
 
 ```text
 在这个项目中安装 OpenSpec 并帮我完成设置。请按顺序执行以下步骤，遇到要求停下
@@ -73,6 +104,8 @@
 <a id="package-managers"></a>
 
 ## 包管理器
+
+用包管理器安装需要 **Node.js 20.19.0 或更高版本**(用 `node --version` 检查)。
 
 ### npm
 
@@ -157,13 +190,20 @@ nix profile install github:studyzy/OpenSpec-cn
 openspec-cn --version
 ```
 
+## 从 npm 切换到独立安装
+
+切换是可选的;npm 安装会继续可用。你的设置和项目都会沿用，改变的只是程序本身。
+
+1. 运行 `openspec-cn install`。它会安装独立副本，并打印用于移除旧副本的命令。
+2. 运行那条命令，例如 `npm uninstall -g @studyzy/openspec-cn`(Homebrew:`brew uninstall openspec`)。在那之前，旧副本在 `PATH` 上仍会优先运行。
+3. 在新终端中运行 `openspec-cn version`。它应当打印 `OpenSpec <version> (standalone)`。如果它显示的是某个包管理器，说明 `PATH` 上还有另一份副本:`which -a openspec-cn`(Windows:`where.exe openspec-cn`)会把它们都列出来。
+
 ## 更新
 
-升级包,然后刷新每个项目生成的文件:
+再次运行[安装命令](#install)来升级 CLI(用包管理器时:`npm install -g @studyzy/openspec-cn@latest` 或 pnpm/yarn/bun 的等价命令)。然后刷新每个项目生成的文件:
 
 ```bash
-npm install -g @studyzy/openspec-cn@latest   # 或 pnpm/yarn/bun 的等价命令
-openspec-cn update                              # 在每个项目内运行
+openspec-cn update   # 在每个项目内运行
 ```
 
 `openspec-cn update` 会为你已配置的工具重新生成 skill 与 command 文件，从而让你的斜杠命令与已安装的版本保持同步。它还会检查是否发布了更新的 CLI 并提示你升级，因为正是升级才让新的工作流成为可用 —— 参见 [CLI 参考](cli.md#openspec-update)。
@@ -172,13 +212,15 @@ openspec-cn update                              # 在每个项目内运行
 
 ## 卸载
 
-没有 `openspec-cn uninstall` 命令,因为 OpenSpec 只是一个全局包加上你项目中的一些文件。移除它需要几个手动步骤,这里没有任何操作会触及你的源代码。
+没有 `openspec-cn uninstall` 命令,因为 OpenSpec 只是一个程序加上你项目中的一些文件。移除它需要几个手动步骤,这里没有任何操作会触及你的源代码。
 
-**1. 移除全局包:**
+**1. 移除 CLI。** 删除安装器放置的文件:`~/.local/bin/openspec-cn`,Windows 上为 `%LOCALAPPDATA%\Programs\openspec-cn\openspec-cn.exe`(并从你的用户 `PATH` 中移除该文件夹)。如果你是用包管理器安装的:
 
 ```bash
 npm uninstall -g @studyzy/openspec-cn   # 或: pnpm rm -g / yarn global remove / bun rm -g
 ```
+
+当该目录可写时，独立二进制还会在你的 OpenSpec 数据目录(`~/.local/share/openspec/binary-schemas`,Windows 上为 `%LOCALAPPDATA%\openspec\binary-schemas`)下保留一份内置 schema 的副本，你也可以把它一并删掉。
 
 **2. 从项目中移除 OpenSpec(可选)。** 如果你不再需要其中的 specs 和变更,删除 `openspec/` 目录:
 

@@ -112,7 +112,7 @@ Do this only for `missing-tracking`.
 2. Read `.changeset/README.md` immediately before authoring.
 3. Only when no suitable PR exists, create a short `changeset-<scope>` branch from current `origin/main`. Use a temporary worktree so the operator's checkout remains untouched.
 4. Prefer one changeset per coherent release unit. A single catch-up changeset may summarize several small items selected for the same release.
-5. Use the exact package name `"@fission-ai/openspec"`, the highest required semantic bump, only relevant headings, and user-focused descriptions.
+5. Use the exact package name `"@studyzy/openspec-cn"`, the highest required semantic bump, only relevant headings, and user-focused descriptions.
 6. Validate before pushing:
 
    ```bash
@@ -143,10 +143,11 @@ After the Version Packages PR merges:
 
 1. Find the release workflow run for the merge commit and wait for completion.
 2. Verify all three artifacts independently:
-   - `npm view @fission-ai/openspec@<version> version`
+   - `npm view @studyzy/openspec-cn@<version> version`
    - remote tag `v<version>` points at the expected commit;
    - `gh release view v<version>` exists and is not a prerelease.
-3. If only some artifacts exist, report partial state and resume verification before retrying any publish action. Never republish a version already on npm.
+   - The release's assets include the 8 `openspec-cn-*` standalone binaries and `SHA256SUMS`, attached by the Binaries workflow (`binaries.yml`) about 10 minutes after the release is published. Until `SHA256SUMS` is there, the install scripts keep installing the previous release, so users are never left without one.
+3. If only some artifacts exist, report partial state and resume verification before retrying any publish action. Never republish a version already on npm. Missing binaries never need an npm action: re-run `binaries.yml` with `workflow_dispatch` and the release tag to attach them.
 4. Once all artifacts exist, read [references/release-notes.md](references/release-notes.md), polish the GitHub Release, and verify the saved title/body.
 
 ## Cut a beta

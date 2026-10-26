@@ -402,7 +402,7 @@ OpenSpec 还支持通过独立仓库分发的社区维护 schema。它们提供�
 | `anvil` | @jikkujoyce | [jikkujoyce/openspec-schemas](https://github.com/jikkujoyce/openspec-schemas/tree/main/schemas/anvil) | 带 TDD 纪律和对抗式评审步骤的规范驱动工作流。流程：`proposal` → `specs` → `design` → `review` → `test-plan` → `tasks` → `apply` → `verify`。`review` 由一个全新上下文、只读的评审者撰写（有条件时使用第二个模型），并输出一行 `VERDICT:`，指示 Agent 对 `test-plan`、`tasks` 和 `apply` 进行门禁控制；OpenSpec 只检查制品是否存在，因此需要你用自己的 CI 或 hook 来强制执行该门禁。`test-plan` 把每个 spec 场景映射到一个具名测试，同时充当由 `verify` 审计的红/绿状态台账。 |
 | `ml-research` | @tsenst | [idealo/openspec-schemas](https://github.com/idealo/openspec-schemas/tree/main/openspec/schemas/ml-research) | 机器学习实验工作流。流程：`proposal` → `design` → `evaluation` → `tasks` → `apply` → `specs`。`evaluation` 在运行前固定指标、成功标准与证伪条件；`apply` 写入 `results.md`；`specs` 只记录有证据支持的发现（包括被证伪的假设），写成带关联 `Evidence:` 块的 `Finding:` 需求。 |
 
-> 想贡献一个社区 schema？开一个 issue 并附上你的仓库链接，或提交一个 PR 往这个表格里加一行。
+> 想贡献一个社区 schema？开一个 issue，附上你的仓库链接和一句话描述，维护者会把它加到表格里。
 
 ---
 

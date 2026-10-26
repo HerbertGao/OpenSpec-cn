@@ -152,4 +152,4 @@ OpenSpec 在强推理模型上效果最好。README 推荐像 Codex、5.5、Opus
 
 ### 这些文档有误或让人困惑。我该怎么办？
 
-告诉我们，或者自己修。我们欢迎并重视文档 PR。开一个 issue 或发一个 pull request。
+告诉我们。提交一个[文档 issue](https://github.com/studyzy/OpenSpec-cn/issues/new?template=docs.yml)，写明是哪个页面、哪里不对 —— 文档修正是对我们最有价值的反馈之一。

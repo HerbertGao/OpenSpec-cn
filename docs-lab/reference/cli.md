@@ -51,6 +51,7 @@
 | 命令 | 作用 |
 |---|---|
 | [`openspec-cn version`](#openspec-cn-version) | 报告已安装的版本，并可选检查更新。 |
+| [`openspec-cn install`](#openspec-cn-install) | 安装独立 `openspec`，无需 Node.js 即可运行。 |
 | [`openspec-cn feedback`](#openspec-cn-feedback) | 提交关于 OpenSpec 的反馈。 |
 | [`openspec-cn completion`](#openspec-cn-completion) | 安装或生成 shell 补全。 |
 
@@ -145,6 +146,7 @@ Restart your IDE for the new commands to take effect.
 ```bash
 openspec-cn update           # 刷新文件版本早于 CLI 的工具
 openspec-cn update --force   # 即使文件是最新的也重写
+openspec-cn update --dry-run # 列出更新会改动什么，但不做任何改动
 ```
 
 update 会找到 init 配置的工具，并把它们生成的文件与 CLI 的版本比较。当存在更新的 OpenSpec 版本时，它会先提议升级 CLI，然后用升级后的版本重新运行。设置 `OPENSPEC_NO_UPDATE_CHECK=1` 可跳过该检查。
@@ -160,6 +162,50 @@ update 会找到 init 配置的工具，并把它们生成的文件与 CLI 的�
 | 标志 | 作用 |
 |---|---|
 | `--force` | 即使每个已配置工具的文件都是最新的也重写。 |
+| `--dry-run` | 报告更新将新增、修改或删除的每一个文件，并且不写入任何内容。不检查 CLI 升级，也不提示。可与 `--force` 组合以预览强制更新。 |
+| `--json` | 与 `--dry-run` 搭配时，以 JSON 打印计划。不带 `--dry-run` 时以退出码 1 结束。 |
+
+**预览更新**
+
+`--dry-run` 会规划一次非交互式运行将执行的更新：同一条代码路径，但每一次写入和删除都会被记录下来，而不是真的执行。真实更新会触碰的每一个文件都会被列出，包括：
+
+- 把 OpenSpec 文件从工具原先的目录迁出（`.kimi/` → `.kimi-code/`、`.windsurf/` → `.devin/`、`.codex/` 与 `.agent/` → `.agents/`）；
+- 为 profile 之前的老安装保存其全局配置；
+- 同步 GitHub Copilot 云端编程 Agent 文件；
+- 在 `--force` 下，为只在旧版产物中发现的工具做设置并清理这些产物，包括已退役的全局 Codex 提示词。
+
+```bash
+openspec-cn update --dry-run
+```
+
+```
+2 file(s) would change:
+  update  .claude/skills/openspec-propose/SKILL.md  (claude)
+  add     ~/.config/openspec/config.json  (openspec)
+```
+
+`--dry-run --json` 把同一份计划打印为一个 JSON 文档：
+
+```json
+{
+  "changes": [
+    { "path": ".claude/skills/openspec-propose/SKILL.md", "action": "update", "tool": "claude" },
+    { "path": "~/.config/openspec/config.json", "action": "add", "tool": "openspec" }
+  ],
+  "notes": [],
+  "failures": []
+}
+```
+
+| 字段 | 内容 |
+|---|---|
+| `changes[].path` | 相对于项目的路径。项目之外的文件（如全局 skill 或全局配置）会从你的主目录开始以 `~/...` 显示；若同样在主目录之外，则显示为绝对路径。 |
+| `changes[].action` | `add`、`update` 或 `delete`。新内容与旧内容完全相同的文件不会被列出。 |
+| `changes[].tool` | 文件所属的已配置工具，例如 `claude`。属于 OpenSpec 自身而非某个工具的文件（全局配置与旧版产物清理）为 `openspec`。 |
+| `notes[]` | 终端用户会被询问的步骤的 `{ code, message }`。`legacy-tool-directories`：交互式运行会先询问的移动；`changes` 会把它列为已执行。`legacy-artifacts`：发现了 OpenSpec 旧布局的文件，例如 `openspec-proposal.md` 斜杠命令或 `AGENTS.md` 中的 OpenSpec 标记块。没有 `--force` 时，非交互式更新会保留它们，因此 `changes` 也不会列出；`--dry-run --force` 会列出它们的清理。普通刷新时为空。 |
+| `failures[]` | 真实更新会失败的每个工具的 `{ tool, error }`，包括它无法完成的写入：文件该在的位置被目录占用、目录该在的位置被文件占用，或者文件/文件夹没有写权限。对该工具，`changes` 会在真实更新停下的地方停下；其他工具仍会被规划。磁盘只在写入过程中才报告的错误（如空间不足）无法预知。 |
+
+规划开始前的失败（例如没有 OpenSpec 目录）仍然只打印一个 JSON 文档：空计划加上一个 `status` 数组，其中包含 `severity`、`code`（`update_error`）和 `message`。退出码为 1。
 
 **输出**
 
@@ -2231,7 +2277,7 @@ openspec-cn version --check --json  # 结构化的本地与更新报告
 OpenSpec 1.13.2 (npm, global)
 ```
 
-安装范围（scope）为 `global`（全局）、`project`（项目）、`temporary`（npx 等临时运行器）或 `source`（源码检出）。OpenSpec 会省略它无法识别的细节，而不是猜测。
+安装范围（scope）为 `global`（全局）、`project`（项目）、`temporary`（npx 等临时运行器）、`source`（源码检出），或 `standalone`（[独立安装](../start/installation.md#install)）。OpenSpec 会省略它无法识别的细节，而不是猜测。
 
 `--json` 会把未知的细节保留为显式的 `null` 值：
 
@@ -2282,12 +2328,45 @@ OpenSpec 1.13.2 (npm, global)
 | `disabled` | 已有的隐私或更新检查设置阻止了 registry 访问。`latest` 为 `null`。 |
 | `offline` | registry 不可用或返回了不可用的响应。`latest` 为 `null`。 |
 
+对于独立安装，更新命令是 `openspec-cn install`。
+
 `DO_NOT_TRACK`、遥测退出选择、`OPENSPEC_NO_UPDATE_CHECK`、CI 检测以及被拒绝的非 HTTPS registry 覆盖都会禁用该检查。禁用和离线的检查仍以 0 退出，因为更新可用性是建议性的。此命令绝不升级 OpenSpec；`canSelfUpgrade` 只报告现有的 `openspec-cn update` 路径能否安全升级当前副本。
 
 **退出码**
 
 - `0`：本地报告已打印，包括禁用或离线的更新检查。
 - `1`：命令语法无效，例如不支持的 `--upgrade` 选项。
+
+<a id="openspec-cn-install"></a>
+
+## openspec-cn install
+
+安装独立的 `openspec-cn`，它是单个文件，无需 Node.js 即可运行。在 npm 或 Homebrew 安装下运行它可切换安装方式；在独立安装下运行则原地升级。
+
+```bash
+openspec-cn install          # 最新发布版
+openspec-cn install 1.15.0   # 指定某个发布版
+```
+
+它会运行[安装脚本](../start/installation.md#install)：挑选文件全部齐全的最新发布版和适合你机器的文件，并用该发布版的 `SHA256SUMS` 校验：
+
+- **从包管理器安装时**：安装到 `~/.local/bin`（Windows：`%LOCALAPPDATA%\Programs\openspec-cn`），并打印用于移除旧副本的命令，例如 `npm uninstall -g @studyzy/openspec-cn`。它绝不自行移除旧副本。
+- **从独立安装升级时**：在它现在所在的位置、以它自己的文件名替换正在运行的文件。
+
+完成后它会说明 `openspec-cn` 现在运行的是哪一份副本，因为 PATH 上更靠前的包管理器副本在你移除它之前仍会继续运行。
+
+**参数**
+
+| 参数 | 说明 |
+|---|---|
+| `version` | 要安装的发布版，如 `1.15.0`。可选；默认最新。 |
+
+`OPENSPEC_INSTALL_DIR` 与 `OPENSPEC_INSTALL_NAME` 可选择其他文件夹或文件名。
+
+**退出码**
+
+- `0`：已安装。
+- `1`：版本不是发布版，或者下载/安装失败。你当前的副本保持原样。
 
 ## openspec-cn feedback
 
@@ -2298,7 +2377,7 @@ openspec-cn feedback "Validate output is hard to scan"
 openspec-cn feedback "Archive fails on Windows" --body "Steps: init, propose, archive. Error: EPERM."
 ```
 
-CLI 通过你的 `gh` CLI 把你的消息作为 GitHub issue 提交到 `Fission-AI/OpenSpec` 仓库。标题变为 `Feedback: <message>`。正文包含你的 `--body` 文本，外加带 CLI 版本、平台和时间戳的页脚。该 issue 会获得 `feedback` 标签。如果仓库没有定义该标签，CLI 会去掉标签重试并说明。
+CLI 通过你的 `gh` CLI 把你的消息作为 GitHub issue 提交到 `studyzy/OpenSpec-cn` 仓库。标题变为 `Feedback: <message>`。正文沿用 bug 表单的标题：你的消息放在 `What happened` 下，`--body` 文本放在 `Details` 下，还有一个 `Minimal steps to reproduce` 小节请你补充复现步骤，因为 CLI 无法代填。页脚会附加 CLI 版本、平台和时间戳。该 issue 会获得 `feedback` 标签。如果仓库没有定义该标签，CLI 会去掉标签重试并说明。
 
 **参数**
 
@@ -2318,10 +2397,10 @@ CLI 通过你的 `gh` CLI 把你的消息作为 GitHub issue 提交到 `Fission-
 
 ```
 ✓ Feedback submitted successfully!
-Issue URL: https://github.com/Fission-AI/OpenSpec/issues/1234
+Issue URL: https://github.com/studyzy/OpenSpec-cn/issues/1234
 ```
 
-没有安装 `gh`，或 `gh` 未登录时，不会提交任何内容。CLI 在 `--- FORMATTED FEEDBACK ---` 标记之间打印你格式化后的反馈，然后打印一个预填的新 issue URL 供在浏览器中打开。未登录的路径会追加 `To auto-submit in the future: gh auth login`。
+没有安装 `gh`，或 `gh` 未登录时，不会提交任何内容。CLI 在 `--- FORMATTED FEEDBACK ---` 标记之间打印你格式化后的反馈，然后打印一个链接，在浏览器中打开 bug 报告表单，并预填标题、what happened（你的消息和 `--body` 文本）、CLI 版本和环境（平台和 Node 版本）。你在浏览器中补完表单的其余部分。未登录的路径会追加 `To auto-submit in the future: gh auth login`。
 
 **退出码**
 

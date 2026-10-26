@@ -4,7 +4,7 @@
  * Shows resolved template paths for all artifacts in a schema.
  */
 
-import ora from 'ora';
+import type { Ora } from 'ora';
 import path from 'path';
 import {
   resolveSchema,
@@ -34,7 +34,11 @@ export interface TemplateInfo {
 // -----------------------------------------------------------------------------
 
 export async function templatesCommand(options: TemplatesOptions): Promise<void> {
-  const spinner = options.json ? undefined : ora('正在加载模板...').start();
+  let spinner: Ora | undefined;
+  if (!options.json) {
+    const { default: ora } = await import('ora');
+    spinner = ora('正在加载模板...').start();
+  }
 
   try {
     const projectRoot = process.cwd();

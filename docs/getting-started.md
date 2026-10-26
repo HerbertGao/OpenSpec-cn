@@ -14,7 +14,7 @@
 完整循环，每步标注了它发生在哪里：
 
 ```text
-TERMINAL   $ npm install -g @fission-ai/openspec@latest
+TERMINAL   $ npm install -g @studyzy/openspec-cn@latest
 TERMINAL   $ cd your-project && openspec-cn init
 AI CHAT      /opsx:explore                    (可选：先理清思路)
 AI CHAT      /opsx:propose add-dark-mode      (AI 起草计划；你评审它)
@@ -22,9 +22,9 @@ AI CHAT      /opsx:apply                      (AI 构建它)
 AI CHAT      /opsx:archive                    (specs 已更新，变更已归档)
 ```
 
-两步终端操作完成设置，然后你就在聊天里了。本指南的其余部分将拆解每个步骤做了什么，以及你会看到什么。
+两步终端操作完成设置，然后你就在聊天里了。（Windows、独立二进制及其他安装方式见[安装](installation.md)。）本指南的其余部分将拆解每个步骤做了什么，以及你会看到什么。
 
-**Don't want to do the terminal part yourself?** Paste the [setup prompt](installation.md#install-with-your-ai-assistant) into your assistant and it handles both lines, then reports what it created.
+**不想自己动手敲终端？** 把[安装提示词](installation.md#install-with-your-ai-assistant)粘贴给你的助手，它会替你完成这两行，并汇报它创建了什么。
 
 > **还不确定要构建什么？从 `/opsx:explore` 开始。** 它是一个零负担的思考伙伴，会阅读你的代码库、权衡选项，并在写下任何代码之前把一个模糊的想法打磨成具体计划。当画面清晰时，它交接给 `/opsx:propose`。这是与一个否则会自信地构建出错误东西的 AI 共事时，单个最佳习惯。请参阅[探索指南](explore.md)。
 

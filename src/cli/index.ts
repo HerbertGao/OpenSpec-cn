@@ -331,10 +331,37 @@ program
 
 program
   .command('update [path]')
-  .description('更新OpenSpec指令文件')
+  .description('更新 OpenSpec 指令文件')
   .option('--force', '即使工具已是最新也强制更新')
-  .action(async (targetPath = '.', options?: { force?: boolean }) => {
+  .option('--dry-run', '仅报告更新会做哪些改动，不写入任何内容')
+  .option('--json', '配合 --dry-run，将计划改动以 JSON 输出')
+  .action(
+    async (
+      targetPath = '.',
+      options?: { force?: boolean; dryRun?: boolean; json?: boolean }
+    ) => {
     try {
+      if (options?.json && !options?.dryRun) {
+        console.error('--json 只能与 --dry-run 一起使用。');
+        process.exitCode = 1;
+        return;
+      }
+
+      // A dry run reports the plan and nothing else: no network check, no
+      // upgrade prompt, no output that would break --json.
+      if (options?.dryRun) {
+        const [{ UpdateCommand }, { formatUpdatePlan }] = await Promise.all([
+          import('../core/update.js'),
+          import('../core/update-plan.js'),
+        ]);
+        const plan = await new UpdateCommand({
+          force: options?.force,
+          dryRun: true,
+        }).plan(targetPath);
+        console.log(options?.json ? JSON.stringify(plan, null, 2) : formatUpdatePlan(plan));
+        return;
+      }
+
       const [
         {
           getInstallDir,
@@ -406,6 +433,34 @@ program
       } else if (latestVersion) {
         displayCliUpdateNote(latestVersion, targetPath);
       }
+
+      // Once per machine, a package-manager user hears the standalone install
+      // exists. Offered, never pushed; deferred when stderr is not a terminal.
+      const { maybeShowStandaloneTip } = await import('../core/standalone-tip.js');
+      await maybeShowStandaloneTip({ silent: !process.stderr.isTTY });
+    } catch (error) {
+      // The --json dry run follows the agent contract: exactly one JSON
+      // document on stdout, even on failure.
+      // failWithError sets the exit code. Returning instead of process.exit()
+      // lets piped stdout drain - an exit can cut the JSON document short where
+      // pipes are asynchronous (macOS, Windows) - and keeps commander's
+      // postAction telemetry flush, as the upgrade paths above already do.
+      await failWithError(error, {
+        enabled: options?.dryRun && options?.json,
+        payload: { changes: [], notes: [], failures: [] },
+        fallbackCode: 'update_error',
+      });
+    }
+    }
+  );
+
+program
+  .command('install [version]')
+  .description('安装独立版 openspec-cn，无需 Node.js（未指定 [version] 时安装最新发布版）')
+  .action(async (version?: string) => {
+    try {
+      const { installStandalone } = await import('../commands/install-standalone.js');
+      await installStandalone({ version });
     } catch (error) {
       await failWithError(error);
       process.exit(1);
