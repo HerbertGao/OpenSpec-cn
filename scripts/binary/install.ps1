@@ -1,4 +1,4 @@
-# Installs the standalone `openspec-cn.exe` (no Node.js needed) on Windows.
+﻿# Installs the standalone `openspec-cn.exe` (no Node.js needed) on Windows.
 #
 #   irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
 #
@@ -68,10 +68,11 @@
       # "latest" is not trusted. SHA256SUMS is uploaded last: a release that
       # has it is complete.
       $feed = ''
-      # PowerShell 7 returns a byte array unless the feed is a text type.
+      # .Content is a byte array for this feed, so the regex would see no tags.
       try {
-        $raw = (Invoke-WebRequest -UseBasicParsing -Uri "$releases.atom").Content
-        $feed = if ($raw -is [byte[]]) { [Text.Encoding]::UTF8.GetString($raw) } else { [string]$raw }
+        $feedPath = Join-Path $tmp 'releases.atom'
+        Invoke-WebRequest -UseBasicParsing -Uri "$releases.atom" -OutFile $feedPath
+        $feed = [IO.File]::ReadAllText($feedPath)
       } catch { Write-Verbose "No release feed: $_" }
       $tags = @([regex]::Matches($feed, '/releases/tag/(v\d+\.\d+\.\d+)"') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
       foreach ($tag in $tags) {
