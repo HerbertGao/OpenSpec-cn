@@ -14,6 +14,12 @@ on:
       tag:
         description: Existing release tag to build and attach binaries to
         required: true
+  workflow_call:
+    inputs:
+      tag:
+        description: Existing release tag to build and attach binaries to
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -53,8 +59,10 @@ jobs:
       - run: bun scripts/binary/build.mjs --all
       # The binaries report package.json's version (smoke.sh checks), so this
       # keeps assets off a release they do not belong to.
+      # A reusable call keeps the caller's event name, so a tag push arrives as
+      # push. inputs.tag is set only for that call and workflow_dispatch.
       - name: Check the version matches the release tag
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (inputs.tag || '') != ''
         run: |
           version=$(node -p "require('./package.json').version")
           # Tags are v1.2.3, or @studyzy/openspec-cn@1.2.3 as changesets first
@@ -253,7 +261,7 @@ jobs:
   release:
     name: Attach to release
     needs: verify
-    if: github.repository == 'studyzy/OpenSpec-cn' && (github.event_name == 'release' || github.event_name == 'workflow_dispatch')
+    if: github.repository == 'studyzy/OpenSpec-cn' && (github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (inputs.tag || '') != '')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
